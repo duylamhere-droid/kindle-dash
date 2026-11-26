@@ -10,9 +10,11 @@ Nhà duy nhất của luật dự án này. Bộ Não (`01_Tien_Do_Du_An.md` m�
 - Chạy ổn định: **0 token AI**.
 
 ## Màn ban ngày (07h–00h), 1 trang, tiếng Việt
-1. **Hạn mức** (trên cùng): Claude % phiên 5 giờ + % tuần + "làm mới lúc HH:MM". ≥ 80% → nền đen "sắp hết". Số cũ > 3 giờ → mờ + "số cũ". Antigravity: chỉ khi đo được, không thì bỏ hẳn.
+1. **Hạn mức** (trên cùng), 2 dòng cùng kiểu: **Claude** và **Antigravity**, mỗi dòng % **đã dùng** 5 giờ + tuần + "làm mới lúc HH:MM". ≥ 80% → nền đen "sắp hết". Số cũ > 3 giờ → mờ + "số cũ".
+   - Claude: thanh trạng thái Claude Code (`rate_limits`) ghi ra file, không đọc token.
+   - Antigravity: máy chủ cục bộ của app (`RetrieveUserQuotaSummary`, chỉ khi app mở), lấy nhóm dùng nhiều nhất, không ghi tên model. Hỏng thì ẩn ô.
 2. **Sự kiện sắp tới**: ~3 ngày, tối đa 6 dòng, ưu tiên ngày gần, tràn thì "+N sự kiện nữa". Lịch: chính + Work + Study + Ngày lễ (ký hiệu nhỏ). Chỉ giờ + tiêu đề, không mô tả/link/người.
-3. **Việc** (tối đa 5 dòng): 3 việc ★ từ mục `## Việc ngắn` của `01_Tien_Do_Du_An.md` (không có ★ thì 3 việc hạn gần nhất) + 2 việc Google Tasks mặc định (ẩn việc xong). Nhãn dự án `[BCTT]` `[Video]` `[Tài chính]` `[Não]` `[Kindle]`, dự án mới cùng kiểu. Có hạn → "còn N ngày", xếp đầu; quá hạn → nền đen.
+3. **Việc** (tối đa 5 dòng): 3 việc ★ từ mục `## Việc ngắn` của `01_Tien_Do_Du_An.md` (không có ★ thì 3 việc hạn gần nhất) + 2 việc Google Tasks mặc định (ẩn việc xong). Nhãn dự án `[BCTT]` `[Video]` `[Tài chính]` `[Não]` `[Kindle]`, dự án mới cùng kiểu. Việc sắp đến hạn luôn xếp đầu ("còn N ngày"). Việc Bộ Não không bao giờ "trễ": qua hạn tự ẩn; không hạn thì tự ẩn sau 7 ngày kể từ ngày ghi (dòng có `+dd/mm`); AI đầu phiên hỏi gọn việc ★ cũ "xong chưa?". Chỉ Google Tasks quá hạn mới nền đen.
 - Ô phụ: thứ + ngày (không âm lịch), thời tiết TP.HCM (Open-Meteo: nhiệt độ + khả năng mưa), pin Kindle, giờ cập nhật. Không hiện giờ phút hiện tại.
 
 ## Màn ban đêm (00h–07h)

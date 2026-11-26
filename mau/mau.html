@@ -23,6 +23,15 @@ body{font-family:"Be Vietnam Pro",sans-serif;font-size:19px;line-height:1.25;pad
 .u.warn{background:#000;color:#fff;padding:10px 12px}
 .u.warn .name,.u.warn .sub{color:#ddd}
 .u.warn .bar{border-color:#fff}.u.warn .bar i{background:#fff}
+.q{display:grid;grid-template-columns:112px 1fr 1fr;gap:4px 14px;align-items:center}
+.qh{font-size:14px;font-weight:700;color:#555}
+.qn{font-weight:800;font-size:18px}
+.qc{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center;padding:4px 8px;margin:0 -8px}
+.qc b{font-size:30px;font-weight:800;letter-spacing:-1px;line-height:1.05}
+.qc .bar{margin:0;height:10px}
+.qc s{grid-column:1/3;text-decoration:none;font-size:13px;color:#444}
+.qc.warn{background:#000;color:#fff}.qc.warn s{color:#ddd}
+.qc.warn .bar{border-color:#fff}.qc.warn .bar i{background:#fff}
 .day{font-size:16px;font-weight:700;margin:6px 0 0;color:#333}
 .ev{display:flex;gap:12px;padding:3px 0}
 .ev .t{width:62px;flex:none;font-weight:700}
@@ -74,20 +83,15 @@ const v=(location.search.match(/v=(\w)/)||[,'a'])[1];document.body.className=v;
     <div class="meta">31° · mưa 40%</div>
   </div>
   <div class="sec card">
-    <div class="label">Hạn mức</div>
-    <div class="usage">
-      <div class="u">
-        <div class="name">Claude · phiên 5 giờ</div>
-        <div class="pct">34<small>%</small></div>
-        <div class="bar"><i style="width:34%"></i></div>
-        <div class="sub">làm mới lúc 15:40</div>
-      </div>
-      <div class="u warn">
-        <div class="name">Claude · tuần này</div>
-        <div class="pct">86<small>%</small></div>
-        <div class="bar"><i style="width:86%"></i></div>
-        <div class="sub">sắp hết · làm mới T2</div>
-      </div>
+    <div class="label">Hạn mức đã dùng</div>
+    <div class="q">
+      <span></span><span class="qh">5 giờ</span><span class="qh">Tuần</span>
+      <span class="qn">Claude</span>
+      <div class="qc"><b>34%</b><div class="bar"><i style="width:34%"></i></div><s>mới lúc 15:40</s></div>
+      <div class="qc warn"><b>86%</b><div class="bar"><i style="width:86%"></i></div><s>sắp hết · mới T2</s></div>
+      <span class="qn">Antigravity</span>
+      <div class="qc"><b>23%</b><div class="bar"><i style="width:23%"></i></div><s>mới lúc 14:43</s></div>
+      <div class="qc"><b>18%</b><div class="bar"><i style="width:18%"></i></div><s>mới T3 01/12</s></div>
     </div>
   </div>
 </div>
@@ -104,11 +108,11 @@ const v=(location.search.match(/v=(\w)/)||[,'a'])[1];document.body.className=v;
 
 <div class="sec card">
   <div class="label">Việc chính</div>
-  <div class="todo late"><span class="star">★</span><span class="txt"><span class="p">[Video]</span> Gửi bản dựng KOL</span><span class="due">trễ 1 ngày</span></div>
+  <div class="todo late"><span class="star">○</span><span class="txt">Gửi hóa đơn anh Hoàng</span><span class="due">trễ 1 ngày</span></div>
   <div class="todo"><span class="star">★</span><span class="txt"><span class="p">[BCTT]</span> Ký mộc + chèn scan</span><span class="due">còn 4 ngày</span></div>
-  <div class="todo"><span class="star">★</span><span class="txt"><span class="p">[Kindle]</span> Chọn mẫu + gửi firmware</span><span class="due"></span></div>
+  <div class="todo"><span class="star">★</span><span class="txt"><span class="p">[BCTT]</span> Gửi ảnh Óc Eo + Hasselblad</span><span class="due"></span></div>
+  <div class="todo"><span class="star">★</span><span class="txt"><span class="p">[Kindle]</span> Gửi firmware + cắm USB</span><span class="due"></span></div>
   <div class="todo"><span class="star">○</span><span class="txt">Mua mực máy in</span><span class="due"></span></div>
-  <div class="todo"><span class="star">○</span><span class="txt">Gọi lại anh Hoàng</span><span class="due"></span></div>
 </div>
 
 <div class="foot"><span>Cập nhật 13:45</span><span>Pin 82%</span></div>
