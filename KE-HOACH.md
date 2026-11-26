@@ -3,7 +3,7 @@
 Nhà duy nhất của luật dự án này. Bộ Não (`01_Tien_Do_Du_An.md` mục 3b) chỉ trỏ về đây.
 
 ## Máy móc
-- Kindle Basic 3 (đời 10, 2019), màn dọc 600×800, 167ppi, xám 16 mức. Jailbreak + `kindle-dash` (KUAL): thức → Wi-Fi → tải PNG → hiện → ngủ.
+- Kindle Paperwhite 3 (đời 7, 2015 — Lâm chụp Device Info 26/11; trước ghi nhầm Basic 3), firmware 5.16.2.1.1, màn dọc 1072×1448, 300ppi, xám 16 mức. Ảnh vẽ bố cục 600 CSS px rồi chụp ×1,786 (`ve/ve.py`). Jailbreak: WinterBreak (firmware < 5.18.1) + `kindle-dash` (KUAL): thức → Wi-Fi → tải PNG → hiện → ngủ.
 - Mac + PC hay tắt → máy chủ là **GitHub Actions** của repo công khai này (miễn phí không giới hạn), cron 15 phút, vẽ PNG → GitHub Pages (đường dẫn khó đoán).
 - Bí mật (link iCal bí mật, token đọc `Lam_AI_Brain`, Google Tasks) chỉ nằm trong Actions secrets. Repo không chứa dữ liệu cá nhân.
 - Mac/PC khi mở phiên Claude: hook đẩy `usage.json` (chỉ con số, token Claude không rời máy). Cũng giữ repo "có hoạt động" để GitHub không tắt cron.

@@ -1,4 +1,4 @@
-"""Vẽ màn hình Kindle 600x800 (HTML + PNG xám 16 mức) từ dữ liệu JSON/Markdown."""
+"""Vẽ màn hình Kindle 1072x1448 (PW3) (HTML + PNG xám 16 mức) từ dữ liệu JSON/Markdown."""
 
 from __future__ import annotations
 
@@ -488,7 +488,7 @@ def _ve_html_ngay(m: dict) -> str:
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&display=block" rel="stylesheet">
 <style>
 *{{box-sizing:border-box;margin:0;padding:0}}
-html,body{{width:600px;height:800px;overflow:hidden;background:#fff;color:#000}}
+html,body{{width:600px;height:810px;overflow:hidden;background:#fff;color:#000}}
 body{{font-family:"Be Vietnam Pro",sans-serif;font-size:17px;line-height:1.25;padding:14px 26px 0;position:relative}}
 .head{{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}}
 .date{{font-size:26px;font-weight:800;letter-spacing:-.5px}}
@@ -545,7 +545,7 @@ body{{font-family:"Be Vietnam Pro",sans-serif;font-size:17px;line-height:1.25;pa
 (function(){{
   var lich=document.getElementById("lich"),viec=document.getElementById("viec");
   if(!lich||!viec)return;
-  function tran(){{return viec.getBoundingClientRect().bottom>800-36;}}
+  function tran(){{return viec.getBoundingClientRect().bottom>810-36;}}
   if(!tran())return;
   var cut=0,more=document.createElement("div");
   more.className="more";
@@ -595,7 +595,7 @@ def _ve_html_dem(m: dict) -> str:
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;700;800&display=block" rel="stylesheet">
 <style>
 *{{box-sizing:border-box;margin:0;padding:0}}
-html,body{{width:600px;height:800px;overflow:hidden;background:#fff;color:#000}}
+html,body{{width:600px;height:810px;overflow:hidden;background:#fff;color:#000}}
 body{{font-family:"Be Vietnam Pro",sans-serif;font-size:19px;line-height:1.28;position:relative}}
 svg{{display:block;margin-bottom:-18px}}
 .txt{{padding:0 40px}}
@@ -660,7 +660,7 @@ h1{{font-size:44px;font-weight:800;letter-spacing:-1px;margin-top:0}}
 (function(){{
   var txt=document.getElementById("txt"),lich=document.getElementById("lich-dem");
   if(!txt||!lich)return;
-  function tran(){{return txt.getBoundingClientRect().bottom>800-40;}}
+  function tran(){{return txt.getBoundingClientRect().bottom>810-40;}}
   if(!tran())return;
   var cut=0,more=document.createElement("div");
   more.className="more";
@@ -679,7 +679,7 @@ h1{{font-size:44px;font-weight:800;letter-spacing:-1px;margin-top:0}}
 
 
 def ve_html(mo_hinh: dict) -> str:
-    """Dựng chuỗi HTML 600x800 hoàn chỉnh từ mô hình đã tính."""
+    """Dựng chuỗi HTML 1072x1448 (PW3) hoàn chỉnh từ mô hình đã tính."""
     if mo_hinh.get("che_do") == "dem":
         return _ve_html_dem(mo_hinh)
     return _ve_html_ngay(mo_hinh)
@@ -695,7 +695,7 @@ def _tim_chrome() -> str:
 
 
 def chup(html_path: str | Path, png_path: str | Path) -> None:
-    """Chụp HTML 600x800 bằng Chrome headless và đổi sang PNG xám 16 mức."""
+    """Chụp HTML 1072x1448 (PW3) bằng Chrome headless và đổi sang PNG xám 16 mức."""
     from PIL import Image
 
     html_abs = Path(html_path).resolve()
@@ -706,8 +706,8 @@ def chup(html_path: str | Path, png_path: str | Path) -> None:
         "--headless=new",
         "--disable-gpu",
         "--hide-scrollbars",
-        "--force-device-scale-factor=1",
-        "--window-size=600,800",
+        "--force-device-scale-factor=1.786667",  # Paperwhite 3: 1072x1448, giữ bố cục 600 CSS px
+        "--window-size=600,810",
         "--run-all-compositor-stages-before-draw",
         "--virtual-time-budget=8000",
         f"--screenshot={png_abs}",
@@ -715,12 +715,12 @@ def chup(html_path: str | Path, png_path: str | Path) -> None:
     ]
     subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
     with Image.open(png_abs) as img:
-        xam = img.convert("L").quantize(16).convert("L")
+        xam = img.convert("L").resize((1072, 1448)).quantize(16).convert("L")
         xam.save(png_abs)
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Vẽ ảnh Kindle 600x800 từ dữ liệu JSON/Markdown.")
+    parser = argparse.ArgumentParser(description="Vẽ ảnh Kindle 1072x1448 (PW3) từ dữ liệu JSON/Markdown.")
     parser.add_argument("--du-lieu", required=True, help="Thư mục dữ liệu đầu vào")
     parser.add_argument("--ra", required=True, help="Thư mục xuất dash.html và dash.png")
     parser.add_argument("--gio", help="Thời điểm giả lập ISO (YYYY-MM-DDTHH:MM), mặc định giờ VN hiện tại")
