@@ -15,6 +15,18 @@ def luc(s):
     return datetime.fromisoformat(s).replace(tzinfo=VN)
 
 
+def du_lieu_claude(pct_5h, luc_ts=None):
+    return {
+        "claude": {
+            "rate_limits": {
+                "five_hour": {"used_percentage": pct_5h, "resets_at": None},
+                "seven_day": {"used_percentage": 90, "resets_at": None},
+            },
+            "luc": luc_ts,
+        }
+    }
+
+
 class TestNgay(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -41,58 +53,43 @@ class TestNgay(unittest.TestCase):
         self.assertEqual((o5["pct"], o5["phu"]), (23, "làm mới lúc 14:43"))
         self.assertEqual((ot["pct"], ot["phu"]), (18, "làm mới T3 01/12"))
 
-    def test_su_kien_4_ngay_bo_viec_da_qua(self):
-        ngay = self.m["su_kien"]
-        self.assertEqual([d["nhan"] for d in ngay], ["Hôm nay", "Thứ Sáu 27/11", "Thứ Bảy 28/11", "Chủ Nhật 29/11"])
-        self.assertEqual([(x["gio"], x["tieu_de"]) for x in ngay[0]["dong"]], [("16:00", "Gọi khách hàng")])
-        self.assertEqual([(x["gio"], x["tieu_de"]) for x in ngay[1]["dong"]],
-                         [("Cả ngày", "Ngày lễ mẫu"), ("08:30", "Đi làm"), ("20:00", "Meet sửa bài - Thực Tập TTĐPT")])
-        self.assertEqual([(x["gio"], x["tieu_de"]) for x in ngay[2]["dong"]], [("09:00", "Quay vlog")])
-
-    def test_viec_chi_tu_google_tasks(self):
-        v = self.m["viec"]
-        self.assertEqual(v[0]["chu"], "Gửi hóa đơn anh Hoàng")
-        self.assertEqual((v[0]["tre"], v[0]["han"]), (True, "trễ 1 ngày"))
-        self.assertIn("Mua mực máy in", [x["chu"] for x in v])
-        self.assertNotIn("Gửi firmware + cắm USB", [x["chu"] for x in v])  # không lấy từ Bộ Não
-        self.assertLessEqual(len(v), 5)
+    def test_meo_theo_claude_5h(self):
+        # Du lieu mau co Claude 5h = 34% (du tuan = 86%) -> meo tim
+        self.assertEqual(self.m["meo"]["loai"], "tim")
+        self.assertEqual(ve.tinh(du_lieu_claude(62), luc("2026-11-26T14:10"))["meo"]["loai"], "ban")
+        self.assertEqual(ve.tinh(du_lieu_claude(85), luc("2026-11-26T14:10"))["meo"]["loai"], "gian")
+        # 21h-22h59 va 5h < 80% -> meo toi; neu 5h >= 80% -> van meo gian
+        self.assertEqual(ve.tinh(du_lieu_claude(30), luc("2026-11-26T21:30"))["meo"]["loai"], "toi")
+        self.assertEqual(ve.tinh(du_lieu_claude(85), luc("2026-11-26T21:30"))["meo"]["loai"], "gian")
 
 
 class TestKhac(unittest.TestCase):
-    def test_so_cu_hon_3_gio(self):
+    def test_so_cu_hon_3_gio_ra_meo_hoi(self):
         m = ve.tinh(ve.doc_du_lieu(MAU), luc("2026-11-26T18:00"))
         self.assertTrue(m["han_muc"][0]["cu"])
+        self.assertEqual(m["meo"]["loai"], "hoi")
 
-    def test_thieu_file_claude(self):
+    def test_thieu_file_claude_ra_meo_hoi(self):
         d = ve.doc_du_lieu(MAU); d.pop("claude", None)
         m = ve.tinh(d, luc("2026-11-26T14:10"))
         self.assertFalse(m["han_muc"][0]["co_so"])
+        self.assertEqual(m["meo"]["loai"], "hoi")
 
-    def test_ban_dem(self):
-        m = ve.tinh(ve.doc_du_lieu(MAU), luc("2026-11-27T01:00"))
-        self.assertEqual(m["che_do"], "dem")
-        self.assertEqual(m["ngay_tieu_de"], "Mai là Thứ Sáu, 27/11")
-        self.assertEqual([x["tieu_de"] for x in m["su_kien"][0]["dong"]],
-                         ["Ngày lễ mẫu", "Đi làm", "Meet sửa bài - Thực Tập TTĐPT"])
-        self.assertLessEqual(len(m["viec"]), 3)
-
-    def test_7h_la_ban_ngay(self):
+    def test_ban_dem_23h_den_7h(self):
+        self.assertEqual(ve.tinh(ve.doc_du_lieu(MAU), luc("2026-11-26T23:00"))["che_do"], "dem")
+        self.assertEqual(ve.tinh(ve.doc_du_lieu(MAU), luc("2026-11-27T01:00"))["che_do"], "dem")
         self.assertEqual(ve.tinh(ve.doc_du_lieu(MAU), luc("2026-11-27T07:00"))["che_do"], "ngay")
 
     def test_reset_qua_nua_dem_van_hien_gio(self):
         _, phu = ve._dinh_dang_han_muc(10, luc("2026-11-27T02:02"), luc("2026-11-26T22:41"), False)
         self.assertEqual(phu, "làm mới lúc 02:02")
 
-    def test_lam_sach_task(self):
-        self.assertEqual(ve.lam_sach_task('Added a new reminder to my list: "ôn apt"'), "ôn apt")
-        self.assertEqual(ve.lam_sach_task("Mua mực"), "Mua mực")
-
-    def test_html_co_dong_ho_khong_thoi_tiet(self):
+    def test_html_co_dong_ho_va_meo(self):
         h = ve.ve_html(ve.tinh(ve.doc_du_lieu(MAU), luc("2026-11-26T14:10")))
-        for chu in ["Claude", "Antigravity", "Lịch", "Todo list", "14:10", "Cập nhật 14:10", "trễ 1 ngày"]:
+        for chu in ["Claude", "Antigravity", "14:10", "Cập nhật 14:10", "cat-box", "bubble"]:
             self.assertIn(chu, h)
+        self.assertNotIn("Todo list", h)
         self.assertNotIn("mưa", h)
-        self.assertNotIn("class=\"tag\"", h)
 
 
 if __name__ == "__main__":
