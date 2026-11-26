@@ -217,7 +217,7 @@ def _tinh_su_kien(du_lieu: dict, bay_gio: datetime) -> list[dict]:
         su_kien_raw = []
 
     hom_nay = bay_gio.date()
-    ba_ngay = [hom_nay + timedelta(days=i) for i in range(3)]
+    ba_ngay = [hom_nay + timedelta(days=i) for i in range(4)]  # Apps Script trả 4 ngày tới
     gom: dict[date, list[tuple[int, datetime, str, str]]] = {d: [] for d in ba_ngay}
 
     for ev in su_kien_raw:
@@ -546,7 +546,18 @@ body{{font-family:"Be Vietnam Pro",sans-serif;font-size:17px;line-height:1.25;pa
   var lich=document.getElementById("lich"),viec=document.getElementById("viec");
   if(!lich||!viec)return;
   function tran(){{return viec.getBoundingClientRect().bottom>810-36;}}
-  if(!tran())return;
+  if(!tran()){{
+    // ít việc: phóng chữ Lịch + Todo cho lấp chỗ trống, tối đa 1.35 lần
+    var z=1;
+    while(z<1.35){{
+      z+=0.02;lich.style.zoom=viec.style.zoom=z;
+      if(tran()){{z-=0.02;lich.style.zoom=viec.style.zoom=z;break;}}
+    }}
+    // vẫn trống: kéo ô Todo xuống sát chân trang (min-height tính theo đơn vị đã zoom)
+    var r=viec.getBoundingClientRect(),du=810-36-r.bottom;
+    if(du>0)viec.style.minHeight=((r.height+du)/z)+"px";
+    return;
+  }}
   var cut=0,more=document.createElement("div");
   more.className="more";
   lich.appendChild(more);
@@ -560,6 +571,8 @@ body{{font-family:"Be Vietnam Pro",sans-serif;font-size:17px;line-height:1.25;pa
     }}
     more.textContent="+"+cut+" sự kiện nữa";
   }}
+  var r=viec.getBoundingClientRect(),du=810-36-r.bottom;
+  if(du>0)viec.style.minHeight=(r.height+du)+"px";
 }})();
 </script>
 </body>

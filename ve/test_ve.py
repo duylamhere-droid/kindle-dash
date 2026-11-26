@@ -41,9 +41,9 @@ class TestNgay(unittest.TestCase):
         self.assertEqual((o5["pct"], o5["phu"]), (23, "làm mới lúc 14:43"))
         self.assertEqual((ot["pct"], ot["phu"]), (18, "làm mới T3 01/12"))
 
-    def test_su_kien_3_ngay_bo_viec_da_qua(self):
+    def test_su_kien_4_ngay_bo_viec_da_qua(self):
         ngay = self.m["su_kien"]
-        self.assertEqual([d["nhan"] for d in ngay], ["Hôm nay", "Thứ Sáu 27/11", "Thứ Bảy 28/11"])
+        self.assertEqual([d["nhan"] for d in ngay], ["Hôm nay", "Thứ Sáu 27/11", "Thứ Bảy 28/11", "Chủ Nhật 29/11"])
         self.assertEqual([(x["gio"], x["tieu_de"]) for x in ngay[0]["dong"]], [("16:00", "Gọi khách hàng")])
         self.assertEqual([(x["gio"], x["tieu_de"]) for x in ngay[1]["dong"]],
                          [("Cả ngày", "Ngày lễ mẫu"), ("08:30", "Đi làm"), ("20:00", "Meet sửa bài - Thực Tập TTĐPT")])
