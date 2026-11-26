@@ -1,0 +1,7 @@
+{"luc":1795676400,"response":{"groups":[
+ {"displayName":"Gemini Models","buckets":[
+   {"bucketId":"gemini-weekly","window":"weekly","remainingFraction":0.82,"resetTime":"2026-12-01T06:30:20Z"},
+   {"bucketId":"gemini-5h","window":"5h","remainingFraction":0.77,"resetTime":"2026-11-26T07:43:39Z"}]},
+ {"displayName":"Claude and GPT models","buckets":[
+   {"bucketId":"3p-weekly","window":"weekly","remainingFraction":1},
+   {"bucketId":"3p-5h","window":"5h","remainingFraction":1}]}]}}

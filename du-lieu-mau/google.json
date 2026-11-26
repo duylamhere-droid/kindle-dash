@@ -1,0 +1,19 @@
+{"luc":"2026-11-26T07:05:00Z",
+ "su_kien":[
+  {"bat_dau":"2026-11-26T01:30:00Z","ket_thuc":"2026-11-26T02:00:00Z","ca_ngay":false,"tieu_de":"Họp sáng (đã qua)","lich":"W"},
+  {"bat_dau":"2026-11-26T09:00:00Z","ket_thuc":"2026-11-26T10:00:00Z","ca_ngay":false,"tieu_de":"Gọi khách hàng","lich":""},
+  {"bat_dau":"2026-11-26T17:00:00Z","ket_thuc":"2026-11-27T17:00:00Z","ca_ngay":true,"tieu_de":"Ngày lễ mẫu","lich":"L"},
+  {"bat_dau":"2026-11-27T01:30:00Z","ket_thuc":"2026-11-27T10:30:00Z","ca_ngay":false,"tieu_de":"Đi làm","lich":"W"},
+  {"bat_dau":"2026-11-27T13:00:00Z","ket_thuc":"2026-11-27T14:00:00Z","ca_ngay":false,"tieu_de":"Meet sửa bài - Thực Tập TTĐPT","lich":""},
+  {"bat_dau":"2026-11-28T02:00:00Z","ket_thuc":"2026-11-28T03:00:00Z","ca_ngay":false,"tieu_de":"Quay vlog","lich":"S"},
+  {"bat_dau":"2026-11-29T02:00:00Z","ket_thuc":"2026-11-29T03:00:00Z","ca_ngay":false,"tieu_de":"Ngoài 3 ngày - không hiện","lich":""}
+ ],
+ "viec":[
+  {"id":"t1","tieu_de":"Added a new reminder to my list: \"Mua mực máy in\"","han":null},
+  {"id":"t2","tieu_de":"Gửi hóa đơn anh Hoàng","han":"2026-11-25T00:00:00.000Z"},
+  {"id":"t3","tieu_de":"ký mộc báo cáo, chèn scan","han":null},
+  {"id":"t4","tieu_de":"Gọi lại thợ sửa xe","han":null}
+ ],
+ "xong_gan_day":[
+  {"id":"t9","tieu_de":"Gửi ảnh Óc Eo và Hasselblad","luc":"2026-11-26T03:00:00.000Z"}
+ ]}
