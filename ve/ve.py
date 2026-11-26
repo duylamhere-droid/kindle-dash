@@ -1,4 +1,4 @@
-"""Vẽ màn hình Kindle 1072x1448 (PW3) (HTML + PNG xám 16 mức) từ dữ liệu JSON/Markdown."""
+"""Vẽ màn hình Kindle 1072x1448 (PW3) (HTML + PNG xám 16 mức) từ dữ liệu JSON."""
 
 from __future__ import annotations
 
@@ -8,9 +8,7 @@ from html import escape
 import json
 import os
 from pathlib import Path
-import re
 import subprocess
-import unicodedata
 from zoneinfo import ZoneInfo
 
 VN = ZoneInfo("Asia/Ho_Chi_Minh")
@@ -21,14 +19,13 @@ TIEN_TO_TASK = 'Added a new reminder to my list: "'
 
 
 def doc_du_lieu(thu_muc: str | Path) -> dict:
-    """Đọc các file dữ liệu trong thư mục; thiếu file thì bỏ qua khóa đó."""
+    """Đọc các file JSON trong thư mục; thiếu file thì bỏ qua khóa đó."""
     goc = Path(thu_muc)
     kq: dict = {}
     for khoa, ten in [
         ("google", "google.json"),
         ("claude", "claude.json"),
         ("antigravity", "antigravity.json"),
-        ("thoi_tiet", "thoi-tiet.json"),
     ]:
         duong = goc / ten
         if duong.is_file():
@@ -36,12 +33,6 @@ def doc_du_lieu(thu_muc: str | Path) -> dict:
                 kq[khoa] = json.loads(duong.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError):
                 pass
-    md = goc / "viec-ngan.md"
-    if md.is_file():
-        try:
-            kq["viec_ngan"] = md.read_text(encoding="utf-8")
-        except OSError:
-            pass
     return kq
 
 
@@ -53,25 +44,6 @@ def lam_sach_task(s: str) -> str:
         if s.endswith('"'):
             s = s[:-1]
     return s.strip()
-
-
-def _chuan_hoa_so_sanh(s: str) -> set[str]:
-    s = unicodedata.normalize("NFD", s)
-    s = "".join(c for c in s if unicodedata.category(c) != "Mn")
-    s = s.replace("đ", "d").replace("Đ", "D").lower()
-    s = re.sub(r"\[[^\]]*\]", " ", s)
-    s = re.sub(r"(?<!\d)\+?\d{1,2}/\d{1,2}(?:/\d{2,4})?(?!\d)", " ", s)
-    s = re.sub(r"[^\w\s]|_", " ", s)
-    return {w for w in s.split() if w}
-
-
-def trung(a: str, b: str) -> bool:
-    """Kiểm tra hai tên việc có trùng nhau (>= 60% từ chung trên chuỗi ngắn hơn)."""
-    wa = _chuan_hoa_so_sanh(a)
-    wb = _chuan_hoa_so_sanh(b)
-    if not wa or not wb:
-        return False
-    return len(wa & wb) / min(len(wa), len(wb)) >= 0.6
 
 
 def _sang_vn(bay_gio: datetime) -> datetime:
@@ -94,23 +66,6 @@ def _doc_gio(val: str | int | float | None) -> datetime | None:
     if dt.tzinfo is None:
         return dt.replace(tzinfo=VN)
     return dt.astimezone(VN)
-
-
-def _suy_ra_ngay(dd_mm: str, tham_chieu: date) -> date | None:
-    try:
-        ngay_s, thang_s = dd_mm.split("/")
-        d, m = int(ngay_s), int(thang_s)
-    except ValueError:
-        return None
-    ung_vien: list[date] = []
-    for nam in (tham_chieu.year - 1, tham_chieu.year, tham_chieu.year + 1):
-        try:
-            ung_vien.append(date(nam, m, d))
-        except ValueError:
-            pass
-    if not ung_vien:
-        return None
-    return min(ung_vien, key=lambda c: abs((c - tham_chieu).days))
 
 
 def _dinh_dang_han_muc(
@@ -184,32 +139,6 @@ def _tinh_han_muc(du_lieu: dict, bay_gio: datetime) -> list[dict]:
     return kq
 
 
-def _tinh_thoi_tiet(du_lieu: dict, bay_gio: datetime, che_do: str) -> str:
-    tt = du_lieu.get("thoi_tiet")
-    if not isinstance(tt, dict):
-        return ""
-    daily = tt.get("daily") or {}
-    times = daily.get("time") or []
-    today_str = bay_gio.strftime("%Y-%m-%d")
-    idx = times.index(today_str) if today_str in times else 0
-    temps_max = daily.get("temperature_2m_max") or []
-    rains = daily.get("precipitation_probability_max") or []
-
-    if che_do == "dem":
-        temp = temps_max[idx] if idx < len(temps_max) else None
-    else:
-        temp = (tt.get("current") or {}).get("temperature_2m")
-        if temp is None and idx < len(temps_max):
-            temp = temps_max[idx]
-
-    rain = rains[idx] if idx < len(rains) else None
-    if temp is None:
-        return ""
-    if rain is None:
-        return f"{round(float(temp))}°"
-    return f"{round(float(temp))}° · mưa {round(float(rain))}%"
-
-
 def _tinh_su_kien(du_lieu: dict, bay_gio: datetime) -> list[dict]:
     google = du_lieu.get("google")
     su_kien_raw = (google or {}).get("su_kien") if isinstance(google, dict) else []
@@ -217,8 +146,8 @@ def _tinh_su_kien(du_lieu: dict, bay_gio: datetime) -> list[dict]:
         su_kien_raw = []
 
     hom_nay = bay_gio.date()
-    ba_ngay = [hom_nay + timedelta(days=i) for i in range(4)]  # Apps Script trả 4 ngày tới
-    gom: dict[date, list[tuple[int, datetime, str, str]]] = {d: [] for d in ba_ngay}
+    bon_ngay = [hom_nay + timedelta(days=i) for i in range(4)]
+    gom: dict[date, list[tuple[int, datetime, str, str]]] = {d: [] for d in bon_ngay}
 
     for ev in su_kien_raw:
         bd = _doc_gio(ev.get("bat_dau"))
@@ -232,7 +161,7 @@ def _tinh_su_kien(du_lieu: dict, bay_gio: datetime) -> list[dict]:
         if ca_ngay:
             ngay_bd = bd.date()
             ngay_kt = (kt - timedelta(seconds=1)).date() if kt is not None else ngay_bd
-            for d in ba_ngay:
+            for d in bon_ngay:
                 if ngay_bd <= d <= ngay_kt:
                     gom[d].append((0, bd, "Cả ngày", tieu_de))
         else:
@@ -241,59 +170,11 @@ def _tinh_su_kien(du_lieu: dict, bay_gio: datetime) -> list[dict]:
                 gom[d].append((1, bd, f"{bd:%H:%M}", tieu_de))
 
     kq: list[dict] = []
-    for i, d in enumerate(ba_ngay):
+    for i, d in enumerate(bon_ngay):
         nhan = "Hôm nay" if i == 0 else f"{THU_DAY[d.weekday()]} {d:%d/%m}"
         gom[d].sort(key=lambda x: (x[0], x[1]))
         dong = [{"gio": gio, "tieu_de": td} for _, _, gio, td in gom[d]]
         kq.append({"nhan": nhan, "dong": dong})
-    return kq
-
-
-def _doc_viec_nao(md: str, hom_nay: date) -> list[dict]:
-    if not md:
-        return []
-    trong_muc = False
-    kq: list[dict] = []
-    for raw in md.splitlines():
-        line = raw.strip()
-        if line.startswith("## Việc ngắn"):
-            trong_muc = True
-            continue
-        if trong_muc and line.startswith("#"):
-            break
-        if not trong_muc or not line.startswith("- "):
-            continue
-        rest = line[2:].strip()
-        sao = False
-        if rest.startswith("★"):
-            sao = True
-            rest = rest[1:].strip()
-        nhan: str | None = None
-        m_nhan = re.match(r"^\[([^\]]+)\]\s*", rest)
-        if m_nhan:
-            nhan = m_nhan.group(1).strip()
-            rest = rest[m_nhan.end():]
-        ngay_ghi: date | None = None
-        m_ghi = re.search(r"\s*\+(\d{1,2}/\d{1,2})\s*$", rest)
-        if m_ghi:
-            ngay_ghi = _suy_ra_ngay(m_ghi.group(1), hom_nay)
-            rest = rest[:m_ghi.start()]
-        han_ngay: date | None = None
-        m_han = re.search(r"\s*[·•]\s*(\d{1,2}/\d{1,2})\s*$", rest)
-        if m_han:
-            han_ngay = _suy_ra_ngay(m_han.group(1), hom_nay)
-            rest = rest[:m_han.start()]
-        chu = rest.strip()
-        if chu:
-            kq.append(
-                {
-                    "sao": sao,
-                    "nhan": nhan,
-                    "chu": chu,
-                    "han_ngay": han_ngay,
-                    "ngay_ghi": ngay_ghi,
-                }
-            )
     return kq
 
 
@@ -309,114 +190,26 @@ def _chu_han(han_ngay: date | None, hom_nay: date) -> tuple[str, bool]:
 
 
 def _tinh_viec(du_lieu: dict, bay_gio: datetime, che_do: str) -> list[dict]:
+    """Lấy danh sách Todo duy nhất từ Google Tasks (việc có hạn xếp trước)."""
     hom_nay = bay_gio.date()
     google = du_lieu.get("google") or {}
-    xong_gan_day = [
-        lam_sach_task(str(x.get("tieu_de", "")))
-        for x in (google.get("xong_gan_day") or [])
-        if x.get("tieu_de")
-    ]
-
-    viec_nao_raw = _doc_viec_nao(str(du_lieu.get("viec_ngan") or ""), hom_nay)
-    viec_nao_hop_le: list[dict] = []
-    for v in viec_nao_raw:
-        han_ngay = v["han_ngay"]
-        ngay_ghi = v["ngay_ghi"]
-        if han_ngay is not None and han_ngay < hom_nay:
-            continue
-        if han_ngay is None and ngay_ghi is not None and (hom_nay - ngay_ghi).days > 7:
-            continue
-        if any(trung(v["chu"], x) for x in xong_gan_day):
-            continue
-        viec_nao_hop_le.append(v)
-
-    sao_list = [v for v in viec_nao_hop_le if v["sao"]]
-    if che_do == "dem":
-        chon_nao = sorted(
-            sao_list,
-            key=lambda v: (v["han_ngay"] is None, v["han_ngay"] or date.max),
-        )[:3]
-        kq = []
-        for v in chon_nao:
-            han_str, _ = _chu_han(v["han_ngay"], hom_nay)
-            kq.append(
-                {
-                    "sao": True,
-                    "nhan": v["nhan"],
-                    "chu": v["chu"],
-                    "han": han_str,
-                    "tre": False,
-                }
-            )
-        return kq
-
-    if sao_list:
-        chon_nao = sao_list[:3]
-    else:
-        chon_nao = sorted(
-            [v for v in viec_nao_hop_le if v["han_ngay"] is not None],
-            key=lambda v: v["han_ngay"],
-        )[:3]
-
     viec_gg_raw = google.get("viec") if isinstance(google, dict) else []
     if not isinstance(viec_gg_raw, list):
-        viec_gg_raw = []
-    gg_loc: list[tuple[int, dict]] = []
+        return []
+
+    ds: list[tuple[bool, date, int, dict]] = []
     for idx, g in enumerate(viec_gg_raw):
         chu = lam_sach_task(str(g.get("tieu_de", "")))
         if not chu:
             continue
-        if any(trung(chu, v["chu"]) for v in chon_nao):
-            continue
         han_raw = g.get("han")
         han_ngay = date.fromisoformat(str(han_raw)[:10]) if han_raw else None
-        gg_loc.append((idx, {"chu": chu, "han_ngay": han_ngay}))
+        han_str, tre = _chu_han(han_ngay, hom_nay)
+        ds.append((han_ngay is None, han_ngay or date.max, idx, {"chu": chu, "han": han_str, "tre": tre}))
 
-    gg_loc.sort(key=lambda item: (item[1]["han_ngay"] is None, item[0]))
-    chon_gg = [item[1] for item in gg_loc[:2]]
-
-    tat_ca: list[tuple[tuple, dict]] = []
-    for idx, v in enumerate(chon_nao):
-        han_str, _ = _chu_han(v["han_ngay"], hom_nay)
-        key = (
-            (0, v["han_ngay"], 0, idx)
-            if v["han_ngay"] is not None
-            else (1, date.max, 0, idx)
-        )
-        tat_ca.append(
-            (
-                key,
-                {
-                    "sao": v["sao"],
-                    "nhan": v["nhan"],
-                    "chu": v["chu"],
-                    "han": han_str,
-                    "tre": False,
-                },
-            )
-        )
-    for idx, g in enumerate(chon_gg):
-        han_str, tre = _chu_han(g["han_ngay"], hom_nay)
-        key = (
-            (0, g["han_ngay"], 1, idx)
-            if g["han_ngay"] is not None
-            else (2, date.max, 1, idx)
-        )
-        tat_ca.append(
-            (
-                key,
-                {
-                    "sao": False,
-                    "nhan": None,
-                    "chu": g["chu"],
-                    "han": han_str,
-                    "tre": tre,
-                },
-            )
-        )
-
-    tat_ca.sort(key=lambda x: x[0])
-    return [item[1] for item in tat_ca[:5]]
+    ds.sort(key=lambda item: (item[0], item[1], item[2]))
+    gioi_han = 3 if che_do == "dem" else 5
+    return [item[3] for item in ds[:gioi_han]]
 
 
 def tinh(du_lieu: dict, bay_gio: datetime) -> dict:
@@ -430,7 +223,7 @@ def tinh(du_lieu: dict, bay_gio: datetime) -> dict:
     return {
         "che_do": che_do,
         "ngay_tieu_de": ngay_tieu_de,
-        "thoi_tiet": _tinh_thoi_tiet(du_lieu, bg, che_do),
+        "gio_24": f"{bg:%H:%M}",
         "cap_nhat": f"{bg:%H:%M}",
         "han_muc": _tinh_han_muc(du_lieu, bg),
         "su_kien": _tinh_su_kien(du_lieu, bg),
@@ -441,7 +234,7 @@ def tinh(du_lieu: dict, bay_gio: datetime) -> dict:
 def _ve_html_ngay(m: dict) -> str:
     the_hm = []
     for hm in m["han_muc"]:
-        cls = "card cu" if hm["cu"] else "card"
+        cls = "card ai cu" if hm["cu"] else "card ai"
         if hm["co_so"]:
             o_html = "".join(
                 f'<div class="u{" warn" if o["canh_bao"] else ""}">'
@@ -473,69 +266,72 @@ def _ve_html_ngay(m: dict) -> str:
     viec_html: list[str] = []
     for v in m["viec"]:
         cls = "todo late" if v["tre"] else "todo"
-        sao = "★" if v["sao"] else "○"
-        nhan = f'<span class="p">[{escape(v["nhan"])}]</span> ' if v["nhan"] else ""
         han = f'<span class="due">{escape(v["han"])}</span>' if v["han"] else ""
         viec_html.append(
-            f'  <div class="{cls}"><span class="s">{sao}</span>'
-            f'<span class="txt">{nhan}{escape(v["chu"])}</span>{han}</div>'
+            f'  <div class="{cls}"><span class="s">○</span>'
+            f'<span class="txt">{escape(v["chu"])}</span>{han}</div>'
         )
+    if not viec_html:
+        viec_html.append('  <div class="ev none">— Không có việc nào</div>')
 
     return f"""<!doctype html>
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=block" rel="stylesheet">
 <style>
 *{{box-sizing:border-box;margin:0;padding:0}}
 html,body{{width:600px;height:810px;overflow:hidden;background:#fff;color:#000}}
-body{{font-family:"Be Vietnam Pro",sans-serif;font-size:17px;line-height:1.25;padding:14px 26px 0;position:relative}}
-.head{{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}}
-.date{{font-size:26px;font-weight:800;letter-spacing:-.5px}}
-.meta{{font-size:15px;color:#444}}
-.card{{border:2.5px solid #000;border-radius:14px;padding:8px 14px;margin-top:7px}}
+body{{font-family:"Be Vietnam Pro",sans-serif;font-size:15px;line-height:1.25;padding:16px 26px 0;position:relative}}
+.head{{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1.5px solid #000;margin-bottom:2px}}
+.date,.clock{{font-size:28px;font-weight:800;letter-spacing:-.6px;line-height:1}}
+.clock{{font-variant-numeric:tabular-nums}}
+.card{{border:1.8px solid #222;border-radius:14px;padding:10px 16px;margin-top:9px}}
+.card.ai{{border:2.5px solid #000;border-radius:16px;padding:14px 18px 15px;margin-top:11px}}
 .card.cu{{opacity:.45}}
-.label{{font-size:13px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#555;margin-bottom:4px}}
-.brand{{font-size:19px;font-weight:800;letter-spacing:-.3px;line-height:1.1}}
-.usage{{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+.label{{font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#555;margin-bottom:5px}}
+.brand{{font-size:22px;font-weight:800;letter-spacing:-.4px;line-height:1.05;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #d4d4d4}}
+.usage{{display:grid;grid-template-columns:1fr 1fr;gap:18px}}
 .u{{padding:2px 0}}
-.u .name{{font-size:14px;color:#444}}
-.u .pct{{font-size:34px;font-weight:800;line-height:1;letter-spacing:-2px}}
-.u .pct small{{font-size:20px;letter-spacing:0}}
-.bar{{height:10px;border:2px solid #000;margin-top:4px;position:relative}}
+.u .name{{font-size:14.5px;font-weight:600;color:#444;margin-bottom:4px}}
+.u .pct{{font-size:56px;font-weight:800;line-height:.95;letter-spacing:-2.5px;font-variant-numeric:tabular-nums}}
+.u .pct small{{font-size:26px;letter-spacing:0;font-weight:700;margin-left:1px}}
+.bar{{height:14px;border:2px solid #000;border-radius:999px;margin-top:9px;position:relative;overflow:hidden}}
 .bar i{{position:absolute;inset:0 auto 0 0;background:#000}}
-.u .sub{{font-size:12px;color:#444;margin-top:2px}}
-.u.warn{{background:#000;color:#fff;padding:6px 10px;margin:-4px -6px;border-radius:9px}}
-.u.warn .name,.u.warn .sub{{color:#ddd}}
+.u .sub{{font-size:13px;font-weight:500;color:#555;margin-top:6px}}
+.u.warn{{background:#000;color:#fff;padding:8px 12px 9px;margin:-6px -8px;border-radius:11px}}
+.u.warn .name,.u.warn .sub{{color:#d8d8d8}}
 .u.warn .bar{{border-color:#fff}}.u.warn .bar i{{background:#fff}}
-.lv{{font-size:19px}}
-.lv .label{{font-size:15px;margin-bottom:6px}}
-.day{{font-size:16px;font-weight:700;color:#333;margin:6px 0 0}}
-.ev{{display:flex;gap:12px;padding:2px 0}}
-.ev .t{{min-width:62px;flex:none;font-weight:700;white-space:nowrap}}
+.lich-card{{font-size:13.5px;padding:9px 16px}}
+.lich-card .day{{font-size:12px;font-weight:700;color:#555;margin:5px 0 1px}}
+.lich-card .day:first-of-type{{margin-top:0}}
+.ev{{display:flex;gap:10px;padding:1.5px 0}}
+.ev .t{{min-width:54px;flex:none;font-weight:700;white-space:nowrap}}
 .ev.none{{color:#666;font-style:italic}}
-.more{{font-size:15px;color:#555;padding:2px 0}}
-.todo{{display:flex;align-items:baseline;gap:10px;padding:3px 0}}
-.todo+.todo{{border-top:1px solid #bbb}}
-.todo .s{{width:18px;flex:none;font-weight:800}}
-.todo .p{{font-weight:700;font-size:15px}}
+.more{{font-size:12px;color:#555;padding:3px 0 0}}
+.todo-card{{font-size:15px;padding:9px 16px}}
+.todo{{display:flex;align-items:baseline;gap:8px;padding:4px 0}}
+.todo+.todo{{border-top:1px solid #dcdcdc}}
+.todo .s{{width:14px;flex:none;font-weight:700;color:#444}}
 .todo .txt{{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
-.todo .due{{font-size:15px;font-weight:700;white-space:nowrap}}
-.todo.late{{background:#000;color:#fff;padding:4px 8px;margin:0 -8px;border-radius:8px}}
-.foot{{position:absolute;left:26px;right:26px;bottom:8px;display:flex;justify-content:space-between;font-size:12px;color:#555;border-top:1.5px solid #000;padding-top:4px}}
+.todo .due{{font-size:12.5px;font-weight:700;white-space:nowrap}}
+.todo.late{{background:#000;color:#fff;padding:4px 9px;margin:0 -9px 2px;border-radius:8px}}
+.todo.late .s{{color:#fff}}
+.todo.late+.todo{{border-top:none}}
+.foot{{position:absolute;left:26px;right:26px;bottom:8px;display:flex;justify-content:space-between;font-size:12px;color:#555;border-top:1px solid #999;padding-top:4px}}
 </style>
 </head>
 <body>
-<div class="head"><div class="date">{escape(m["ngay_tieu_de"])}</div><div class="meta">{escape(m["thoi_tiet"])}</div></div>
+<div class="head"><div class="date">{escape(m["ngay_tieu_de"])}</div><div class="clock">{escape(m["gio_24"])}</div></div>
 
 {chr(10).join(the_hm)}
 
-<div class="card lv" id="lich">
+<div class="card lich-card" id="lich">
   <div class="label">Lịch</div>
 {chr(10).join(su_kien_html)}
 </div>
 
-<div class="card lv" id="viec">
+<div class="card todo-card" id="viec">
   <div class="label">Todo list</div>
 {chr(10).join(viec_html)}
 </div>
@@ -545,33 +341,23 @@ body{{font-family:"Be Vietnam Pro",sans-serif;font-size:17px;line-height:1.25;pa
 (function(){{
   var lich=document.getElementById("lich"),viec=document.getElementById("viec");
   if(!lich||!viec)return;
-  function tran(){{return viec.getBoundingClientRect().bottom>810-36;}}
-  if(!tran()){{
-    // ít việc: phóng chữ Lịch + Todo cho lấp chỗ trống, tối đa 1.35 lần
-    var z=1;
-    while(z<1.35){{
-      z+=0.02;lich.style.zoom=viec.style.zoom=z;
-      if(tran()){{z-=0.02;lich.style.zoom=viec.style.zoom=z;break;}}
-    }}
-    // vẫn trống: kéo ô Todo xuống sát chân trang (min-height tính theo đơn vị đã zoom)
-    var r=viec.getBoundingClientRect(),du=810-36-r.bottom;
-    if(du>0)viec.style.minHeight=((r.height+du)/z)+"px";
-    return;
-  }}
+  function tran(){{return viec.getBoundingClientRect().bottom>810-34;}}
   var cut=0,more=document.createElement("div");
   more.className="more";
-  lich.appendChild(more);
-  while(tran()){{
-    var evs=lich.querySelectorAll(".ev:not(.none)");
-    if(!evs.length)break;
-    evs[evs.length-1].remove();
-    cut++;
-    while(more.previousElementSibling&&more.previousElementSibling.classList.contains("day")){{
-      more.previousElementSibling.remove();
+  if(tran()){{
+    lich.appendChild(more);
+    while(tran()){{
+      var evs=lich.querySelectorAll(".ev:not(.none)");
+      if(!evs.length)break;
+      evs[evs.length-1].remove();
+      cut++;
+      while(more.previousElementSibling&&more.previousElementSibling.classList.contains("day")){{
+        more.previousElementSibling.remove();
+      }}
+      more.textContent="+"+cut+" sự kiện nữa";
     }}
-    more.textContent="+"+cut+" sự kiện nữa";
   }}
-  var r=viec.getBoundingClientRect(),du=810-36-r.bottom;
+  var r=viec.getBoundingClientRect(),du=810-34-r.bottom;
   if(du>0)viec.style.minHeight=(r.height+du)+"px";
 }})();
 </script>
@@ -583,7 +369,7 @@ def _ve_html_dem(m: dict) -> str:
     dong_su_kien = (m["su_kien"][0]["dong"] if m["su_kien"] else [])
     if dong_su_kien:
         lich_html = "\n".join(
-            f'  <div class="row ev"><b >{escape(ev["gio"])}</b><span>{escape(ev["tieu_de"])}</span></div>'
+            f'  <div class="row ev"><b>{escape(ev["gio"])}</b><span>{escape(ev["tieu_de"])}</span></div>'
             for ev in dong_su_kien
         )
     else:
@@ -591,15 +377,12 @@ def _ve_html_dem(m: dict) -> str:
 
     if m["viec"]:
         viec_html = "\n".join(
-            f'  <div class="row"><span>★ {f"""<span class="p">[{escape(v["nhan"])}]</span> """ if v["nhan"] else ""}'
-            f'{escape(v["chu"])}</span>'
+            f'  <div class="row"><span>○ {escape(v["chu"])}</span>'
             f'{f"""<span class="due">{escape(v["han"])}</span>""" if v["han"] else ""}</div>'
             for v in m["viec"]
         )
     else:
-        viec_html = '  <div class="row none"><span>— Không có việc ưu tiên</span></div>'
-
-    phu = m["ngay_tieu_de"] + (f' · {m["thoi_tiet"]}' if m["thoi_tiet"] else "")
+        viec_html = '  <div class="row none"><span>— Không có việc nào</span></div>'
 
     return f"""<!doctype html>
 <html lang="vi">
@@ -620,7 +403,6 @@ h1{{font-size:44px;font-weight:800;letter-spacing:-1px;margin-top:0}}
 .row.none{{color:#666;font-style:italic}}
 .more{{font-size:15px;color:#555;padding:3px 0}}
 .row .due{{margin-left:auto;font-size:15px;font-weight:700;white-space:nowrap}}
-.row .p{{font-weight:700;font-size:15px}}
 .foot{{position:absolute;left:40px;right:40px;bottom:14px;display:flex;justify-content:space-between;font-size:14px;color:#555}}
 </style>
 </head>
@@ -657,7 +439,7 @@ h1{{font-size:44px;font-weight:800;letter-spacing:-1px;margin-top:0}}
 
 <div class="txt" id="txt">
   <h1>Ngủ ngon</h1>
-  <div class="sub">{escape(phu)}</div>
+  <div class="sub">{escape(m["ngay_tieu_de"])}</div>
 
   <div class="label">Lịch ngày mai</div>
   <div id="lich-dem">
@@ -733,7 +515,7 @@ def chup(html_path: str | Path, png_path: str | Path) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Vẽ ảnh Kindle 1072x1448 (PW3) từ dữ liệu JSON/Markdown.")
+    parser = argparse.ArgumentParser(description="Vẽ ảnh Kindle 1072x1448 (PW3) từ dữ liệu JSON.")
     parser.add_argument("--du-lieu", required=True, help="Thư mục dữ liệu đầu vào")
     parser.add_argument("--ra", required=True, help="Thư mục xuất dash.html và dash.png")
     parser.add_argument("--gio", help="Thời điểm giả lập ISO (YYYY-MM-DDTHH:MM), mặc định giờ VN hiện tại")
