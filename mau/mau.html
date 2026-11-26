@@ -9,20 +9,20 @@
 html,body{width:600px;height:800px;overflow:hidden;background:#fff;color:#000}
 body{font-family:"Be Vietnam Pro",sans-serif;font-size:17px;line-height:1.25;padding:14px 26px 0}
 .head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
-.date{font-size:28px;font-weight:800;letter-spacing:-.5px}
-.meta{font-size:14px;color:#444}
+.date{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.meta{font-size:15px;color:#444}
 .card{border:2.5px solid #000;border-radius:14px;padding:8px 14px;margin-top:7px}
 .label{font-size:13px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#555;margin-bottom:4px}
 /* thẻ hạn mức: giống bản đầu, tên công cụ đậm to để phân biệt */
-.brand{font-size:20px;font-weight:800;letter-spacing:-.3px;margin-bottom:2px}
+.brand{font-size:19px;font-weight:800;letter-spacing:-.3px;line-height:1.1}
 .usage{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .u{padding:2px 0}
 .u .name{font-size:14px;color:#444}
-.u .pct{font-size:38px;font-weight:800;line-height:1;letter-spacing:-2px}
+.u .pct{font-size:34px;font-weight:800;line-height:1;letter-spacing:-2px}
 .u .pct small{font-size:20px;letter-spacing:0}
-.bar{height:11px;border:2px solid #000;margin-top:6px;position:relative}
+.bar{height:10px;border:2px solid #000;margin-top:4px;position:relative}
 .bar i{position:absolute;inset:0 auto 0 0;background:#000}
-.u .sub{font-size:12px;color:#444;margin-top:4px}
+.u .sub{font-size:12px;color:#444;margin-top:2px}
 .u.warn{background:#000;color:#fff;padding:6px 10px;margin:-4px -6px}
 .u.warn .name,.u.warn .sub{color:#ddd}
 .u.warn .bar{border-color:#fff}.u.warn .bar i{background:#fff}
@@ -41,10 +41,11 @@ body{font-family:"Be Vietnam Pro",sans-serif;font-size:17px;line-height:1.25;pad
 .todo .due{font-size:15px;font-weight:700;white-space:nowrap}
 .todo.late{background:#000;color:#fff;padding:4px 8px;margin:0 -8px}
 .foot{position:absolute;left:26px;right:26px;bottom:14px;display:flex;justify-content:space-between;font-size:13px;color:#555;border-top:1.5px solid #000;padding-top:6px}
+.foot{position:absolute;left:26px;right:26px;bottom:8px;display:flex;justify-content:space-between;font-size:12px;color:#555;border-top:1.5px solid #000;padding-top:4px}
 </style>
 </head>
 <body>
-<div class="head"><div class="date">Thứ Năm, 26/11</div><div class="meta">31° · mưa 40% · pin 82% · cập nhật 14:10</div></div>
+<div class="head"><div class="date">Thứ Năm, 26/11</div><div class="meta">31° · mưa 40%</div></div>
 
 <div class="card">
   <div class="brand">Claude</div>
@@ -82,5 +83,6 @@ body{font-family:"Be Vietnam Pro",sans-serif;font-size:17px;line-height:1.25;pad
   <div class="todo"><span class="s">○</span><span class="txt">phim</span></div>
 </div>
 
+<div class="foot"><span>Cập nhật 14:10</span><span>Pin 82%</span></div>
 </body>
 </html>
