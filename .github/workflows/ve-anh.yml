@@ -22,8 +22,6 @@ jobs:
   ve:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment:
-      name: github-pages
     steps:
       - uses: actions/checkout@v7
 
@@ -65,4 +63,13 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site
+
+  # Job riêng (theo mẫu GitHub): đăng ngay trong cùng job thì GitHub chưa kịp thấy ảnh vừa tải lên.
+  dang:
+    needs: ve
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: github-pages
+    steps:
       - uses: actions/deploy-pages@v5
