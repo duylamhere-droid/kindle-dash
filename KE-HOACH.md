@@ -24,6 +24,9 @@ Giao diện: **mẫu A đã chốt 26/11** (`mau/mau.html`, ảnh `mau/mau-a.png
 ## Màn ban đêm (00h–07h)
 "Ngủ ngon" + mèo nằm ngủ trên bệ cửa sổ, ánh trăng phía sau (nét đơn giản, hợp e-ink) + lịch và việc chính ngày mai. Kindle ngủ tới 7h.
 
+## Pin (trả lời Lâm 26/11)
+Không cần bấm tắt: giữa 2 lần cập nhật Kindle tự ngủ sâu (màn e-ink giữ ảnh không tốn điện), cứ 15 phút thức ~30 giây bật Wi-Fi tải ảnh rồi ngủ tiếp; 00h–07h ngủ luôn tới sáng. Nút chỉnh cân bằng: giãn lịch ban ngày (15 → 30 phút). Đo pin thật sau GĐ 5 (ghi % pin mỗi sáng) rồi mới chốt.
+
 ## Màn khóa (bấm nút nguồn tắt màn hình) = ảnh đang hiện
 Ban ngày bấm tắt → giữ nguyên dashboard đang hiện; 00h–07h → màn đêm mèo ngủ. Cách làm: mỗi lần tải ảnh, Kindle chép đúng `dash.png` vừa hiện vào thư mục màn chờ của ScreenSavers hack (KUAL, GĐ 5) — 5.17+ cần thêm bước, 5.18 chưa ai xác nhận → đối chiếu đúng firmware; không được thì Kindle giữ màn khóa mặc định.
 - Pin: ảnh vẽ trên đám mây không biết pin Kindle → góc phải chân trang để trống, script trên Kindle tự in "Pin NN%".
