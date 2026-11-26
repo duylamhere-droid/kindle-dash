@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;700;800&display=block" rel="stylesheet">
+<style>
+/* Màn ban đêm 00h–07h, 600×800. Dữ liệu là ví dụ. */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:600px;height:800px;overflow:hidden;background:#fff;color:#000}
+body{font-family:"Be Vietnam Pro",sans-serif;font-size:19px;line-height:1.3}
+svg{display:block}
+.txt{padding:0 40px}
+h1{font-size:46px;font-weight:800;letter-spacing:-1px;margin-top:6px}
+.sub{font-size:18px;color:#444;margin-top:2px}
+.label{font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#555;margin:22px 0 6px}
+.row{display:flex;gap:12px;padding:5px 0;border-bottom:1px solid #ccc}
+.row b{width:62px;flex:none}
+.row .due{margin-left:auto;font-size:15px;font-weight:700;white-space:nowrap}
+.row .p{font-weight:700;font-size:15px}
+.foot{position:absolute;left:40px;right:40px;bottom:18px;display:flex;justify-content:space-between;font-size:14px;color:#555}
+</style>
+</head>
+<body>
+<!-- Mèo ngủ trên bệ cửa sổ, trăng sau kính. Mảng xám phẳng cho e-ink. -->
+<svg width="600" height="420" viewBox="0 0 600 420">
+  <!-- khung cửa sổ -->
+  <rect x="60" y="30" width="480" height="330" fill="#222"/>
+  <rect x="78" y="48" width="444" height="294" fill="#3a3a3a"/>
+  <!-- trăng + quầng -->
+  <circle cx="390" cy="150" r="92" fill="#4a4a4a"/>
+  <circle cx="390" cy="150" r="62" fill="#e8e8e8"/>
+  <circle cx="370" cy="135" r="10" fill="#d0d0d0"/>
+  <circle cx="408" cy="168" r="7" fill="#d0d0d0"/>
+  <!-- sao -->
+  <g fill="#bbb"><circle cx="140" cy="90" r="2.5"/><circle cx="200" cy="150" r="2"/><circle cx="480" cy="80" r="2.5"/><circle cx="250" cy="70" r="1.8"/><circle cx="490" cy="250" r="2"/><circle cx="130" cy="230" r="1.8"/></g>
+  <!-- song cửa -->
+  <rect x="294" y="48" width="12" height="294" fill="#222"/>
+  <rect x="78" y="190" width="444" height="10" fill="#222"/>
+  <!-- bệ cửa -->
+  <rect x="30" y="342" width="540" height="26" rx="4" fill="#888"/>
+  <rect x="30" y="368" width="540" height="10" fill="#555"/>
+  <!-- mèo: thân cuộn tròn -->
+  <g fill="#fff" stroke="#000" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M150 342 C150 278 210 252 268 256 C330 260 372 292 372 342 Z"/>
+    <!-- đầu gục lên thân -->
+    <path d="M330 342 C318 300 340 276 372 274 C404 272 428 296 424 342 Z"/>
+    <!-- tai -->
+    <path d="M350 286 L356 254 L374 276"/>
+    <path d="M396 276 L414 256 L416 290"/>
+  </g>
+  <!-- đuôi vắt qua mép bệ -->
+  <path d="M160 340 C120 344 112 372 128 392 C138 404 156 400 152 388" fill="none" stroke="#000" stroke-width="10" stroke-linecap="round"/>
+  <path d="M160 340 C120 344 112 372 128 392 C138 404 156 400 152 388" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  <!-- mắt nhắm + mũi -->
+  <g fill="none" stroke="#000" stroke-width="3.5" stroke-linecap="round">
+    <path d="M358 312 q8 6 16 0"/><path d="M390 312 q8 6 16 0"/>
+  </g>
+  <path d="M378 324 l4 4 l4 -4 z" fill="#000"/>
+  <!-- vằn lưng -->
+  <g fill="none" stroke="#000" stroke-width="4" stroke-linecap="round">
+    <path d="M220 268 q8 14 2 28"/><path d="M250 260 q8 16 2 32"/><path d="M282 262 q6 14 0 28"/>
+  </g>
+  <!-- z z z -->
+  <g font-family="Be Vietnam Pro" font-weight="800" fill="#fff"><text x="440" y="262" font-size="26">z</text><text x="466" y="236" font-size="20">z</text><text x="486" y="216" font-size="15">z</text></g>
+</svg>
+
+<div class="txt">
+  <h1>Ngủ ngon</h1>
+  <div class="sub">Mai là Thứ Sáu, 27/11 · 30° · mưa 20%</div>
+
+  <div class="label">Lịch ngày mai</div>
+  <div class="row"><b>20:00</b><span>Meet sửa bài – Thực Tập TTĐPT</span></div>
+
+  <div class="label">Việc chính</div>
+  <div class="row"><span>★ <span class="p">[BCTT]</span> Ký mộc + chèn scan</span><span class="due">còn 3 ngày</span></div>
+  <div class="row"><span>★ <span class="p">[Kindle]</span> Chọn mẫu + gửi firmware</span></div>
+</div>
+
+<div class="foot"><span>Dậy lúc 07:00</span><span>Pin 82%</span></div>
+</body>
+</html>

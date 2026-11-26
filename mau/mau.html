@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&display=block" rel="stylesheet">
+<style>
+/* Mẫu giao diện Kindle 600×800 — 3 kiểu A/B/C chọn bằng ?v=a|b|c. Dữ liệu là ví dụ. */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:600px;height:800px;overflow:hidden;background:#fff;color:#000}
+body{font-family:"Be Vietnam Pro",sans-serif;font-size:19px;line-height:1.25;padding:22px 28px 0}
+.head{display:flex;justify-content:space-between;align-items:baseline}
+.date{font-size:30px;font-weight:800;letter-spacing:-.5px}
+.meta{font-size:17px;color:#444;text-align:right}
+.sec{margin-top:18px}
+.label{font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#555;margin-bottom:8px}
+.usage{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.u .name{font-size:16px;color:#444}
+.u .pct{font-size:52px;font-weight:800;line-height:1;letter-spacing:-2px}
+.u .pct small{font-size:22px;letter-spacing:0}
+.bar{height:12px;border:2px solid #000;margin-top:8px;position:relative}
+.bar i{position:absolute;inset:0 auto 0 0;background:#000}
+.u .sub{font-size:15px;color:#444;margin-top:6px}
+.u.warn{background:#000;color:#fff;padding:10px 12px}
+.u.warn .name,.u.warn .sub{color:#ddd}
+.u.warn .bar{border-color:#fff}.u.warn .bar i{background:#fff}
+.day{font-size:16px;font-weight:700;margin:6px 0 0;color:#333}
+.ev{display:flex;gap:12px;padding:3px 0}
+.ev .t{width:62px;flex:none;font-weight:700}
+.ev .tag{font-size:13px;border:1.5px solid #000;padding:0 5px;border-radius:4px;margin-left:6px;vertical-align:2px}
+.ev.none{color:#666;font-style:italic}
+.more{font-size:15px;color:#555;padding-top:4px}
+.todo{display:flex;align-items:baseline;gap:10px;padding:4px 0}
+.todo .star{width:18px;flex:none;font-weight:800}
+.todo .p{font-weight:700;font-size:15px}
+.todo .txt{flex:1}
+.todo .due{font-size:15px;font-weight:700;white-space:nowrap}
+.todo.late{background:#000;color:#fff;padding:6px 8px;margin:0 -8px}
+.foot{position:absolute;left:28px;right:28px;bottom:18px;display:flex;justify-content:space-between;font-size:14px;color:#555;border-top:1.5px solid #000;padding-top:8px}
+
+/* A — Thẻ: khối bo góc như video mẫu */
+.a .card{border:2.5px solid #000;border-radius:14px;padding:9px 16px}
+.a .sec{margin-top:10px}
+.a .usage .u{border:none}
+.a .ev+.ev,.a .todo+.todo{border-top:1px solid #bbb}
+
+/* B — Báo: chữ là chính, kẻ mảnh, không khung */
+.b .date{font-size:38px}
+.b .sec{border-top:3px solid #000;padding-top:8px;margin-top:12px}
+.b .u .pct{font-size:58px}
+.b .ev,.b .todo{border-bottom:1px solid #ccc}
+
+/* C — Đậm: dải đen trên cùng cho hạn mức, tương phản cao */
+.c{padding-top:0}
+.c .top{background:#000;color:#fff;margin:0 -28px;padding:20px 28px 18px}
+.c .top .meta{color:#ccc}
+.c .top .label{color:#bbb}
+.c .top .u .name,.c .top .u .sub{color:#ccc}
+.c .top .bar{border-color:#fff}.c .top .bar i{background:#fff}
+.c .top .u.warn{background:#fff;color:#000}
+.c .top .u.warn .name,.c .top .u.warn .sub{color:#333}
+.c .top .u.warn .bar{border-color:#000}.c .top .u.warn .bar i{background:#000}
+.c .label{border-left:6px solid #000;padding-left:8px}
+.c .top .label{border-color:#fff}
+</style>
+</head>
+<body>
+<script>
+const v=(location.search.match(/v=(\w)/)||[,'a'])[1];document.body.className=v;
+</script>
+
+<div class="top">
+  <div class="head">
+    <div class="date">Thứ Năm, 26/11</div>
+    <div class="meta">31° · mưa 40%</div>
+  </div>
+  <div class="sec card">
+    <div class="label">Hạn mức</div>
+    <div class="usage">
+      <div class="u">
+        <div class="name">Claude · phiên 5 giờ</div>
+        <div class="pct">34<small>%</small></div>
+        <div class="bar"><i style="width:34%"></i></div>
+        <div class="sub">làm mới lúc 15:40</div>
+      </div>
+      <div class="u warn">
+        <div class="name">Claude · tuần này</div>
+        <div class="pct">86<small>%</small></div>
+        <div class="bar"><i style="width:86%"></i></div>
+        <div class="sub">sắp hết · làm mới T2</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec card">
+  <div class="label">Sắp tới</div>
+  <div class="day">Hôm nay</div>
+  <div class="ev none"><span class="t">—</span><span>Không có sự kiện</span></div>
+  <div class="day">Thứ Sáu 27/11</div>
+  <div class="ev"><span class="t">20:00</span><span>Meet sửa bài – Thực Tập TTĐPT</span></div>
+  <div class="day">Chủ Nhật 29/11</div>
+  <div class="ev"><span class="t">09:00</span><span>Quay vlog Tập 14<span class="tag">W</span></span></div>
+</div>
+
+<div class="sec card">
+  <div class="label">Việc chính</div>
+  <div class="todo late"><span class="star">★</span><span class="txt"><span class="p">[Video]</span> Gửi bản dựng KOL</span><span class="due">trễ 1 ngày</span></div>
+  <div class="todo"><span class="star">★</span><span class="txt"><span class="p">[BCTT]</span> Ký mộc + chèn scan</span><span class="due">còn 4 ngày</span></div>
+  <div class="todo"><span class="star">★</span><span class="txt"><span class="p">[Kindle]</span> Chọn mẫu + gửi firmware</span><span class="due"></span></div>
+  <div class="todo"><span class="star">○</span><span class="txt">Mua mực máy in</span><span class="due"></span></div>
+  <div class="todo"><span class="star">○</span><span class="txt">Gọi lại anh Hoàng</span><span class="due"></span></div>
+</div>
+
+<div class="foot"><span>Cập nhật 13:45</span><span>Pin 82%</span></div>
+</body>
+</html>
