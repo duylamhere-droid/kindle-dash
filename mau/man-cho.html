@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;800&display=block" rel="stylesheet">
+<style>
+/* Màn chờ khi bấm tắt màn hình: ảnh tĩnh, không dữ liệu (dữ liệu sẽ cũ khi máy ngủ). */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:600px;height:800px;overflow:hidden;background:#fff;font-family:"Be Vietnam Pro",sans-serif;text-align:center}
+svg{display:block;margin-top:110px}
+h1{font-size:52px;font-weight:800;letter-spacing:-1px;margin-top:30px}
+p{font-size:18px;color:#555;margin-top:8px}
+</style></head><body>
+<svg width="600" height="420" viewBox="0 0 600 420">
+  <!-- khung cửa sổ -->
+  <rect x="60" y="30" width="480" height="330" fill="#222"/>
+  <rect x="78" y="48" width="444" height="294" fill="#3a3a3a"/>
+  <!-- trăng + quầng -->
+  <circle cx="390" cy="150" r="92" fill="#4a4a4a"/>
+  <circle cx="390" cy="150" r="62" fill="#e8e8e8"/>
+  <circle cx="370" cy="135" r="10" fill="#d0d0d0"/>
+  <circle cx="408" cy="168" r="7" fill="#d0d0d0"/>
+  <!-- sao -->
+  <g fill="#bbb"><circle cx="140" cy="90" r="2.5"/><circle cx="200" cy="150" r="2"/><circle cx="480" cy="80" r="2.5"/><circle cx="250" cy="70" r="1.8"/><circle cx="490" cy="250" r="2"/><circle cx="130" cy="230" r="1.8"/></g>
+  <!-- song cửa -->
+  <rect x="294" y="48" width="12" height="294" fill="#222"/>
+  <rect x="78" y="190" width="444" height="10" fill="#222"/>
+  <!-- bệ cửa -->
+  <rect x="30" y="342" width="540" height="26" rx="4" fill="#888"/>
+  <rect x="30" y="368" width="540" height="10" fill="#555"/>
+  <!-- mèo: thân cuộn tròn -->
+  <g fill="#fff" stroke="#000" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M150 342 C150 278 210 252 268 256 C330 260 372 292 372 342 Z"/>
+    <!-- đầu gục lên thân -->
+    <path d="M330 342 C318 300 340 276 372 274 C404 272 428 296 424 342 Z"/>
+    <!-- tai -->
+    <path d="M350 286 L356 254 L374 276"/>
+    <path d="M396 276 L414 256 L416 290"/>
+  </g>
+  <!-- đuôi vắt qua mép bệ -->
+  <path d="M160 340 C120 344 112 372 128 392 C138 404 156 400 152 388" fill="none" stroke="#000" stroke-width="10" stroke-linecap="round"/>
+  <path d="M160 340 C120 344 112 372 128 392 C138 404 156 400 152 388" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  <!-- mắt nhắm + mũi -->
+  <g fill="none" stroke="#000" stroke-width="3.5" stroke-linecap="round">
+    <path d="M358 312 q8 6 16 0"/><path d="M390 312 q8 6 16 0"/>
+  </g>
+  <path d="M378 324 l4 4 l4 -4 z" fill="#000"/>
+  <!-- vằn lưng -->
+  <g fill="none" stroke="#000" stroke-width="4" stroke-linecap="round">
+    <path d="M220 268 q8 14 2 28"/><path d="M250 260 q8 16 2 32"/><path d="M282 262 q6 14 0 28"/>
+  </g>
+  <!-- z z z -->
+  <g font-family="Be Vietnam Pro" font-weight="800" fill="#fff"><text x="440" y="262" font-size="26">z</text><text x="466" y="236" font-size="20">z</text><text x="486" y="216" font-size="15">z</text></g>
+</svg>
+<h1>Ngủ ngon</h1>
+<p>Bấm nút nguồn để mở lại</p>
+</body></html>
