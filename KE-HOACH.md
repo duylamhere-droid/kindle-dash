@@ -24,8 +24,8 @@ Giao diện: **mẫu A đã chốt 26/11** (`mau/mau.html`, ảnh `mau/mau-a.png
 ## Màn ban đêm (00h–07h)
 "Ngủ ngon" + mèo nằm ngủ trên bệ cửa sổ, ánh trăng phía sau (nét đơn giản, hợp e-ink) + lịch và việc chính ngày mai. Kindle ngủ tới 7h.
 
-## Màn chờ (bấm nút nguồn tắt màn hình)
-Ảnh tĩnh mèo ngủ + "Ngủ ngon" (`mau/man-cho.png`, không dữ liệu vì máy ngủ thì số sẽ cũ). Cài ở GĐ 5 bằng ScreenSavers hack qua KUAL — trên firmware 5.17+ cộng đồng báo cần thêm bước hoặc dùng ScreenSaverManager, 5.18 chưa ai xác nhận → đối chiếu đúng firmware rồi mới làm; không được thì Kindle giữ màn mặc định.
+## Màn chờ (bấm nút nguồn tắt màn hình) = màn đêm
+Bấm tắt màn hình thì hiện **đúng màn đêm** (mèo ngủ + lịch/việc chính của "ngày mai"), không có hình riêng. Mỗi lần chạy, đám mây vẽ 2 ảnh: `dash.png` (màn hiện tại) và `dem.png` (màn đêm: trước 7h là hôm nay, từ 7h là ngày mai). Kindle chép `dem.png` vào thư mục màn chờ của ScreenSavers hack (KUAL, GĐ 5) — 5.17+ cần thêm bước, 5.18 chưa ai xác nhận → đối chiếu đúng firmware; không được thì Kindle giữ màn chờ mặc định.
 - Pin: ảnh vẽ trên đám mây không biết pin Kindle → góc phải chân trang để trống, script trên Kindle tự in "Pin NN%".
 
 ## Giai đoạn
