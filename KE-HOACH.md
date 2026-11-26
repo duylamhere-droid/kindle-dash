@@ -10,7 +10,7 @@ Nhà duy nhất của luật dự án này. Bộ Não (`01_Tien_Do_Du_An.md` m�
 - Chạy ổn định: **0 token AI**.
 
 ## Màn ban ngày (07h–00h), 1 trang, tiếng Việt
-Giao diện: **mẫu A** (`mau/mau.html`), thẻ bo góc; lịch + việc chữ nhỏ, dòng sát.
+Giao diện: **mẫu A đã chốt 26/11** (`mau/mau.html`, ảnh `mau/mau-a.png`): ngày + thời tiết trên cùng; 2 thẻ Claude / Antigravity tên đậm; lịch + việc chữ 19px, kẻ mảnh giữa việc, không ký hiệu lịch; chân trang "Cập nhật · Pin". Nhiều sự kiện quá thì cắt + "+N sự kiện nữa" để không tràn.
 1. **Hạn mức** (trên cùng), 2 thẻ riêng cùng kiểu: **Claude** và **Antigravity**, mỗi thẻ 2 ô số to % **đã dùng** 5 giờ + tuần + "làm mới lúc HH:MM". ≥ 80% → nền đen "sắp hết". Số cũ > 3 giờ → mờ + "số cũ".
    - Claude: thanh trạng thái Claude Code (`rate_limits`) ghi ra file, không đọc token.
    - Antigravity: máy chủ cục bộ của app (`RetrieveUserQuotaSummary`, chỉ khi app mở), lấy nhóm dùng nhiều nhất, không ghi tên model. Hỏng thì ẩn ô.
