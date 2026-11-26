@@ -27,6 +27,9 @@ def token_claude():
         return None
 
 
+_NO_WIN = {"creationflags": subprocess.CREATE_NO_WINDOW} if sys.platform == "win32" else {}
+
+
 def _epoch(v):
     if isinstance(v, (int, float)):
         return int(v)
@@ -51,7 +54,7 @@ def so_claude():
             # Token 8 giờ hết hạn: nhờ Claude Code tự làm mới (không gọi model, 0 token) rồi thử lại 1 lần.
             # shortcut: chưa chắc `auth status` làm mới token — kiểm sau 8 giờ, không được thì cần cách khác.
             so_claude.da_thu = True
-            subprocess.run([shutil.which("claude") or "claude", "auth", "status"], capture_output=True, timeout=60)
+            subprocess.run([shutil.which("claude") or "claude", "auth", "status"], capture_output=True, timeout=60, **_NO_WIN)
             return so_claude()
         print("✗ claude: HTTP", e.code); return None
     except Exception as e:
@@ -87,22 +90,21 @@ def so_antigravity():
 
 
 def day(ten, du_lieu, cache):
-    """Ghi so/<ten> lên GitHub bằng gh api (không cần clone repo)."""
+    """Ghi so/<ten> lên GitHub bằng gh api (không cần clone repo). Trả về True nếu có đẩy."""
     khoa = json.dumps(du_lieu, sort_keys=True)
     cu = cache.get(ten, {})
     if cu.get("khoa") == khoa and time.time() - cu.get("luc", 0) < DAY_LAI_SAU:
-        print("= ", ten, "không đổi"); return
+        print("= ", ten, "không đổi"); return False
     du_lieu = dict(du_lieu, luc=int(time.time()))
     path = f"repos/{REPO}/contents/so/{ten}"
-    sha = subprocess.run(["gh", "api", path, "--jq", ".sha"], capture_output=True, text=True).stdout.strip()
+    sha = subprocess.run(["gh", "api", path, "--jq", ".sha"], capture_output=True, text=True, **_NO_WIN).stdout.strip()
     noi_dung = base64.b64encode(json.dumps(du_lieu).encode()).decode()
     args = ["gh", "api", "-X", "PUT", path, "-f", f"message=so: {ten}", "-f", f"content={noi_dung}", "--silent"]
     if sha:
         args += ["-f", f"sha={sha}"]
-    if subprocess.run(args).returncode == 0:
-        cache[ten] = {"khoa": khoa, "luc": time.time()}; print("✓", ten)
-    else:
-        print("✗ đẩy", ten)
+    if subprocess.run(args, **_NO_WIN).returncode == 0:
+        cache[ten] = {"khoa": khoa, "luc": time.time()}; print("✓", ten); return True
+    print("✗ đẩy", ten); return False
 
 
 def main():
@@ -110,11 +112,15 @@ def main():
     NHA.mkdir(exist_ok=True)
     cf = NHA / "da-day.json"
     cache = json.loads(cf.read_text()) if cf.is_file() else {}
+    da_day = False
     for ten, ham in (("claude.json", so_claude), ("antigravity.json", so_antigravity)):
         d = ham()
-        if d:
-            day(ten, d, cache)
+        if d and day(ten, d, cache):
+            da_day = True
     cf.write_text(json.dumps(cache))
+    # GitHub Actions cron hay trễ/bỏ lượt: nếu số không đổi trong giờ thức (7h-23h), gọi vẽ ảnh trực tiếp
+    if not da_day and 7 <= time.localtime().tm_hour < 23:
+        subprocess.run(["gh", "workflow", "run", "ve-anh.yml", "-R", REPO], capture_output=True, **_NO_WIN)
 
 
 if __name__ == "__main__":
