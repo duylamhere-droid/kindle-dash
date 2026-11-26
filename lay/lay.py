@@ -4,7 +4,7 @@ Không in URL/token ra log: lỗi chỉ in tên loại lỗi.
 
 Biến môi trường: GAS_URL, GAS_TOKEN (web app lịch + Tasks), BRAIN_FILE (01_Tien_Do_Du_An.md), SO_DIR (thư mục so/ chứa claude.json, antigravity.json do Mac/PC đẩy lên).
 """
-import json, os, shutil, sys, urllib.parse, urllib.request
+import json, os, shutil, sys, time, urllib.parse, urllib.request
 from pathlib import Path
 
 THOI_TIET = ("https://api.open-meteo.com/v1/forecast?latitude=10.82&longitude=106.63"
@@ -12,9 +12,15 @@ THOI_TIET = ("https://api.open-meteo.com/v1/forecast?latitude=10.82&longitude=10
              "&timezone=Asia%2FHo_Chi_Minh&forecast_days=3")
 
 
-def lay_json(url):
-    with urllib.request.urlopen(url, timeout=60) as r:
-        return json.load(r)
+def lay_json(url, lan=3):
+    for i in range(lan):  # mạng chập chờn: thử lại, cách 5 giây
+        try:
+            with urllib.request.urlopen(url, timeout=60) as r:
+                return json.load(r)
+        except Exception:
+            if i == lan - 1:
+                raise
+            time.sleep(5)
 
 
 def ghi(ra, ten, du_lieu):
