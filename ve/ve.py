@@ -738,11 +738,6 @@ def main() -> int:
     html_path.write_text(html, encoding="utf-8")
     chup(html_path, png_path)
 
-    # Màn chờ (bấm tắt màn hình) = màn đêm: trước 7h là hôm nay, từ 7h là ngày mai.
-    moc_dem = bay_gio if bay_gio.hour < 7 else (bay_gio + timedelta(days=1)).replace(hour=0, minute=30)
-    dem_html = ra / "dem.html"
-    dem_html.write_text(ve_html(tinh(du_lieu, moc_dem)), encoding="utf-8")
-    chup(dem_html, ra / "dem.png")
     return 0
 
 

@@ -1,4 +1,4 @@
-# Mỗi 15 phút: gom dữ liệu → vẽ dash.png + dem.png → đăng lên GitHub Pages ở thư mục bí mật.
+# Mỗi 15 phút: gom dữ liệu → vẽ dash.png → đăng lên GitHub Pages ở thư mục bí mật.
 # Bí mật (Settings → Secrets): GAS_URL, GAS_TOKEN, BRAIN_KEY (khóa chỉ-đọc repo Lam_AI_Brain), PAGES_DIR.
 name: Vẽ ảnh Kindle
 on:
@@ -57,7 +57,7 @@ jobs:
           PAGES_DIR: ${{ secrets.PAGES_DIR }}
         run: |
           mkdir -p "site/$PAGES_DIR"
-          cp ra/dash.png ra/dem.png "site/$PAGES_DIR/"
+          cp ra/dash.png "site/$PAGES_DIR/"
           echo "ok" > site/index.html
 
       - uses: actions/upload-pages-artifact@v5

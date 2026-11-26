@@ -5,7 +5,7 @@ Chạy định kỳ 15 phút (launchd trên Mac, Task Scheduler trên PC). Lâm 
 - Nguồn nào lỗi (app tắt, token hết hạn) thì bỏ qua nguồn đó; Kindle tự hiện "số cũ".
 - Chỉ đẩy khi số đổi hoặc đã quá 2 giờ (để số không bị coi là cũ), tránh spam commit.
 """
-import base64, glob, json, os, subprocess, sys, time, urllib.request
+import base64, glob, json, subprocess, sys, time, urllib.error, urllib.request
 from pathlib import Path
 
 REPO = "duylamhere-droid/kindle-dash"
@@ -46,6 +46,14 @@ def so_claude():
     try:
         with urllib.request.urlopen(req, timeout=20) as r:
             d = json.load(r)
+    except urllib.error.HTTPError as e:
+        if e.code == 401 and not getattr(so_claude, "da_thu", False):
+            # Token 8 giờ hết hạn: nhờ Claude Code tự làm mới (không gọi model, 0 token) rồi thử lại 1 lần.
+            # shortcut: chưa chắc `auth status` làm mới token — kiểm sau 8 giờ, không được thì cần cách khác.
+            so_claude.da_thu = True
+            subprocess.run(["claude", "auth", "status"], capture_output=True, timeout=60)
+            return so_claude()
+        print("✗ claude: HTTP", e.code); return None
     except Exception as e:
         print("✗ claude:", type(e).__name__); return None
     rl = {}
