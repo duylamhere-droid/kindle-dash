@@ -32,6 +32,11 @@ function viec_() {
   return items.filter(t => t.title).map(t => ({ tieu_de: t.title, han: t.due || null }));
 }
 
+// Chạy 1 lần trong trình soạn Apps Script để cấp quyền đọc Lịch + Tasks; in số lượng để kiểm.
+function capQuyen() {
+  Logger.log('Sự kiện: ' + suKien_().length + ' · Việc: ' + viec_().length);
+}
+
 function json_(o) {
   return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
 }
