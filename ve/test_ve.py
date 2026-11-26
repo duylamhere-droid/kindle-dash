@@ -94,7 +94,7 @@ class TestKhac(unittest.TestCase):
 
     def test_html_khong_ky_hieu_lich(self):
         h = ve.ve_html(ve.tinh(ve.doc_du_lieu(MAU), luc("2026-11-26T14:10")))
-        for chu in ["Claude", "Antigravity", "Sắp tới", "Việc chính", "Cập nhật 14:10", "còn 4 ngày", "trễ 1 ngày"]:
+        for chu in ["Claude", "Antigravity", "Lịch", "Todo list", "Cập nhật 14:10", "còn 4 ngày", "trễ 1 ngày"]:
             self.assertIn(chu, h)
         self.assertNotIn('class="tag"', h)
 

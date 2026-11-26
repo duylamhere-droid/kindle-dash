@@ -505,7 +505,7 @@ body{{font-family:"Be Vietnam Pro",sans-serif;font-size:17px;line-height:1.25;pa
 .bar{{height:10px;border:2px solid #000;margin-top:4px;position:relative}}
 .bar i{{position:absolute;inset:0 auto 0 0;background:#000}}
 .u .sub{{font-size:12px;color:#444;margin-top:2px}}
-.u.warn{{background:#000;color:#fff;padding:6px 10px;margin:-4px -6px}}
+.u.warn{{background:#000;color:#fff;padding:6px 10px;margin:-4px -6px;border-radius:9px}}
 .u.warn .name,.u.warn .sub{{color:#ddd}}
 .u.warn .bar{{border-color:#fff}}.u.warn .bar i{{background:#fff}}
 .lv{{font-size:19px}}
@@ -521,7 +521,7 @@ body{{font-family:"Be Vietnam Pro",sans-serif;font-size:17px;line-height:1.25;pa
 .todo .p{{font-weight:700;font-size:15px}}
 .todo .txt{{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
 .todo .due{{font-size:15px;font-weight:700;white-space:nowrap}}
-.todo.late{{background:#000;color:#fff;padding:4px 8px;margin:0 -8px}}
+.todo.late{{background:#000;color:#fff;padding:4px 8px;margin:0 -8px;border-radius:8px}}
 .foot{{position:absolute;left:26px;right:26px;bottom:8px;display:flex;justify-content:space-between;font-size:12px;color:#555;border-top:1.5px solid #000;padding-top:4px}}
 </style>
 </head>
@@ -531,12 +531,12 @@ body{{font-family:"Be Vietnam Pro",sans-serif;font-size:17px;line-height:1.25;pa
 {chr(10).join(the_hm)}
 
 <div class="card lv" id="lich">
-  <div class="label">Sắp tới</div>
+  <div class="label">Lịch</div>
 {chr(10).join(su_kien_html)}
 </div>
 
 <div class="card lv" id="viec">
-  <div class="label">Việc chính</div>
+  <div class="label">Todo list</div>
 {chr(10).join(viec_html)}
 </div>
 
@@ -651,7 +651,7 @@ h1{{font-size:44px;font-weight:800;letter-spacing:-1px;margin-top:0}}
 {lich_html}
   </div>
 
-  <div class="label">Việc chính</div>
+  <div class="label">Todo list</div>
 {viec_html}
 </div>
 
