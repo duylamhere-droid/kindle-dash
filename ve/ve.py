@@ -76,7 +76,7 @@ def _dinh_dang_han_muc(
     if canh_bao:
         parts.append("sắp hết")
     if reset_dt is not None:
-        if reset_dt.date() == bay_gio.date():
+        if reset_dt.date() == bay_gio.date() or 0 <= (reset_dt - bay_gio).total_seconds() < 12 * 3600:
             parts.append(f"làm mới lúc {reset_dt:%H:%M}")
         else:
             parts.append(f"làm mới {THU_NGAN[reset_dt.weekday()]} {reset_dt:%d/%m}")

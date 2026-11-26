@@ -79,6 +79,10 @@ class TestKhac(unittest.TestCase):
     def test_7h_la_ban_ngay(self):
         self.assertEqual(ve.tinh(ve.doc_du_lieu(MAU), luc("2026-11-27T07:00"))["che_do"], "ngay")
 
+    def test_reset_qua_nua_dem_van_hien_gio(self):
+        _, phu = ve._dinh_dang_han_muc(10, luc("2026-11-27T02:02"), luc("2026-11-26T22:41"), False)
+        self.assertEqual(phu, "làm mới lúc 02:02")
+
     def test_lam_sach_task(self):
         self.assertEqual(ve.lam_sach_task('Added a new reminder to my list: "ôn apt"'), "ôn apt")
         self.assertEqual(ve.lam_sach_task("Mua mực"), "Mua mực")
