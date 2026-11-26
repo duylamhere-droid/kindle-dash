@@ -9,7 +9,7 @@
   "runtimeVersion": "V8",
   "oauthScopes": [
     "https://www.googleapis.com/auth/calendar.readonly",
-    "https://www.googleapis.com/auth/tasks.readonly"
+    "https://www.googleapis.com/auth/tasks"
   ],
   "webapp": {
     "executeAs": "USER_DEPLOYING",

@@ -7,7 +7,8 @@ const KY_HIEU = { 'Work': 'W', 'Study': 'S', 'Ngày lễ ở Việt Nam': 'L' };
 
 function doGet(e) {
   if (!e || !e.parameter || e.parameter.token !== TOKEN) return json_({ loi: 'sai token' });
-  return json_({ luc: new Date().toISOString(), su_kien: suKien_(), viec: viec_() });
+  if (e.parameter.xong) return json_(tichXong_(e.parameter.xong));
+  return json_({ luc: new Date().toISOString(), su_kien: suKien_(), viec: viec_(), xong_gan_day: xongGanDay_() });
 }
 
 function suKien_() {
@@ -25,11 +26,30 @@ function suKien_() {
   return ra.sort((a, b) => a.bat_dau < b.bat_dau ? -1 : 1);
 }
 
-function viec_() {
+function dsMacDinh_() {
   const ds = Tasks.Tasklists.list({ maxResults: 1 }).items || []; // danh sách mặc định = đầu tiên
-  if (!ds.length) return [];
-  const items = Tasks.Tasks.list(ds[0].id, { showCompleted: false, maxResults: 50 }).items || [];
-  return items.filter(t => t.title).map(t => ({ tieu_de: t.title, han: t.due || null }));
+  return ds.length ? ds[0].id : null;
+}
+
+function viec_() {
+  const id = dsMacDinh_(); if (!id) return [];
+  const items = Tasks.Tasks.list(id, { showCompleted: false, maxResults: 50 }).items || [];
+  return items.filter(t => t.title).map(t => ({ id: t.id, tieu_de: t.title, han: t.due || null }));
+}
+
+// Việc tích xong 14 ngày qua: Kindle ẩn việc Bộ Não trùng, script đầu phiên xóa dòng Bộ Não.
+function xongGanDay_() {
+  const id = dsMacDinh_(); if (!id) return [];
+  const tu = new Date(Date.now() - 14 * 864e5).toISOString();
+  const items = Tasks.Tasks.list(id, { showCompleted: true, showHidden: true, completedMin: tu, maxResults: 100 }).items || [];
+  return items.filter(t => t.status === 'completed' && t.title).map(t => ({ id: t.id, tieu_de: t.title, luc: t.completed }));
+}
+
+// Chỉ đổi trạng thái thành "xong", không sửa/xóa gì khác.
+function tichXong_(taskId) {
+  const id = dsMacDinh_(); if (!id) return { loi: 'không có danh sách' };
+  try { Tasks.Tasks.patch({ status: 'completed' }, id, taskId); return { ok: true }; }
+  catch (err) { return { loi: String(err) }; }
 }
 
 // Chạy 1 lần trong trình soạn Apps Script để cấp quyền đọc Lịch + Tasks; in số lượng để kiểm.
