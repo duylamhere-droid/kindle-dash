@@ -1,0 +1,68 @@
+# Mỗi 15 phút: gom dữ liệu → vẽ dash.png + dem.png → đăng lên GitHub Pages ở thư mục bí mật.
+# Bí mật (Settings → Secrets): GAS_URL, GAS_TOKEN, BRAIN_KEY (khóa chỉ-đọc repo Lam_AI_Brain), PAGES_DIR.
+name: Vẽ ảnh Kindle
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["so/**", "ve/**", "lay/**", ".github/workflows/ve-anh.yml"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ve-anh
+  cancel-in-progress: true
+
+jobs:
+  ve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lấy file tiến độ từ Bộ Não (chỉ 1 file)
+        uses: actions/checkout@v4
+        with:
+          repository: duylamhere-droid/Lam_AI_Brain
+          ssh-key: ${{ secrets.BRAIN_KEY }}
+          path: brain
+          sparse-checkout: 01_Tien_Do_Du_An.md
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet pillow
+
+      - name: Gom dữ liệu
+        env:
+          GAS_URL: ${{ secrets.GAS_URL }}
+          GAS_TOKEN: ${{ secrets.GAS_TOKEN }}
+          BRAIN_FILE: brain/01_Tien_Do_Du_An.md
+          SO_DIR: so
+        run: python lay/lay.py du-lieu
+
+      - name: Vẽ ảnh
+        env:
+          CHROME: google-chrome
+        run: python ve/ve.py --du-lieu du-lieu --ra ra
+
+      - name: Chuẩn bị trang
+        env:
+          PAGES_DIR: ${{ secrets.PAGES_DIR }}
+        run: |
+          mkdir -p "site/$PAGES_DIR"
+          cp ra/dash.png ra/dem.png "site/$PAGES_DIR/"
+          echo "ok" > site/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4
