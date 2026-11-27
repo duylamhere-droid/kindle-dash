@@ -69,12 +69,14 @@ def _lam_moi_token_claude():
         return False
 
 
-def token_claude():
+def token_claude(lam_moi_neu_sap_het=True):
     full = _doc_claude_creds()
-    try:
-        return full["claudeAiOauth"]["accessToken"]
-    except Exception:
-        return None
+    oauth = (full or {}).get("claudeAiOauth") or {}
+    if lam_moi_neu_sap_het and oauth.get("expiresAt") and oauth.get("refreshToken"):
+        if oauth["expiresAt"] <= (time.time() + 300) * 1000:
+            if _lam_moi_token_claude():
+                oauth = (_doc_claude_creds() or {}).get("claudeAiOauth") or {}
+    return oauth.get("accessToken") or None
 
 
 _NO_WIN = {"creationflags": subprocess.CREATE_NO_WINDOW} if sys.platform == "win32" else {}
@@ -91,9 +93,8 @@ def _epoch(v):
 
 def so_claude():
     tk = token_claude()
-    if not tk:  # chưa đăng nhập Claude Code trong Terminal → dùng số thanh trạng thái (may/statusline.py) nếu có
-        f = NHA / "claude.json"
-        return {"rate_limits": json.loads(f.read_text())["rate_limits"]} if f.is_file() else None
+    if not tk:
+        return None
     req = urllib.request.Request("https://api.anthropic.com/api/oauth/usage", headers={
         "Authorization": "Bearer " + tk, "anthropic-beta": "oauth-2025-04-20", "User-Agent": "kindle-dash"})
     try:
