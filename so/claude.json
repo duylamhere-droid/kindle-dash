@@ -1,1 +1,1 @@
-{"rate_limits": {"five_hour": {"used_percentage": 0.0, "resets_at": null}, "seven_day": {"used_percentage": 92.0, "resets_at": 1795802400}}, "luc": 1795746889}
+{"rate_limits": {"five_hour": {"used_percentage": 3.0, "resets_at": 1795765200}, "seven_day": {"used_percentage": 92.0, "resets_at": 1795802400}}, "luc": 1795747793}
