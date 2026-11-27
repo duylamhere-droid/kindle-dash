@@ -5,24 +5,74 @@ Chạy định kỳ 15 phút (launchd trên Mac, Task Scheduler trên PC). Lâm 
 - Nguồn nào lỗi (app tắt, token hết hạn) thì bỏ qua nguồn đó; Kindle tự hiện "số cũ".
 - Chỉ đẩy khi số đổi hoặc đã quá 2 giờ (để số không bị coi là cũ), tránh spam commit.
 """
-import base64, glob, json, shutil, subprocess, sys, time, urllib.error, urllib.request
+import base64, getpass, glob, json, subprocess, sys, time, urllib.error, urllib.request
 from pathlib import Path
 
 REPO = "duylamhere-droid/kindle-dash"
 NHA = Path.home() / ".kindle-dash"
 DAY_LAI_SAU = 2 * 3600
+CLAUDE_CLIENT_ID = "9d1c250a-e61b-44d9-88ed-5944d1962f5e"
+_CREDS_FILE = Path.home() / ".claude" / ".credentials.json"
 
 
-def token_claude():
+def _doc_claude_creds():
     if sys.platform == "darwin":
         r = subprocess.run(["security", "find-generic-password", "-s", "Claude Code-credentials", "-w"],
                            capture_output=True, text=True)
         raw = r.stdout if r.returncode == 0 else ""
     else:  # Windows/Linux: Claude Code cất trong file
-        f = Path.home() / ".claude" / ".credentials.json"
-        raw = f.read_text(encoding="utf-8") if f.is_file() else ""
+        raw = _CREDS_FILE.read_text(encoding="utf-8") if _CREDS_FILE.is_file() else ""
     try:
-        return json.loads(raw)["claudeAiOauth"]["accessToken"]
+        return json.loads(raw)
+    except Exception:
+        return None
+
+
+def _luu_claude_creds(full):
+    noi_dung = json.dumps(full)
+    if sys.platform == "darwin":
+        subprocess.run(
+            ["security", "add-generic-password", "-U", "-a", getpass.getuser(),
+             "-s", "Claude Code-credentials", "-w", noi_dung],
+            capture_output=True, text=True,
+        )
+    elif _CREDS_FILE.parent.is_dir():
+        _CREDS_FILE.write_text(noi_dung, encoding="utf-8")
+
+
+def _lam_moi_token_claude():
+    full = _doc_claude_creds()
+    oauth = (full or {}).get("claudeAiOauth") or {}
+    rt = oauth.get("refreshToken")
+    if not rt:
+        return False
+    req = urllib.request.Request(
+        "https://platform.claude.com/v1/oauth/token",
+        data=json.dumps({"grant_type": "refresh_token", "refresh_token": rt, "client_id": CLAUDE_CLIENT_ID}).encode(),
+        headers={"Content-Type": "application/json", "User-Agent": "claude-code/2.0"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            res = json.load(r)
+        if not res.get("access_token"):
+            return False
+        oauth["accessToken"] = res["access_token"]
+        if res.get("refresh_token"):
+            oauth["refreshToken"] = res["refresh_token"]
+        if res.get("expires_in"):
+            oauth["expiresAt"] = int((time.time() + res["expires_in"]) * 1000)
+        if res.get("refresh_token_expires_in"):
+            oauth["refreshTokenExpiresAt"] = int((time.time() + res["refresh_token_expires_in"]) * 1000)
+        _luu_claude_creds(full)
+        return True
+    except Exception:
+        return False
+
+
+def token_claude():
+    full = _doc_claude_creds()
+    try:
+        return full["claudeAiOauth"]["accessToken"]
     except Exception:
         return None
 
@@ -51,11 +101,10 @@ def so_claude():
             d = json.load(r)
     except urllib.error.HTTPError as e:
         if e.code == 401 and not getattr(so_claude, "da_thu", False):
-            # Token 8 giờ hết hạn: nhờ Claude Code tự làm mới (không gọi model, 0 token) rồi thử lại 1 lần.
-            # shortcut: chưa chắc `auth status` làm mới token — kiểm sau 8 giờ, không được thì cần cách khác.
+            # Token 8 giờ hết hạn: tự đổi accessToken mới qua OAuth refresh_token (0 tốn token) rồi thử lại 1 lần.
             so_claude.da_thu = True
-            subprocess.run([shutil.which("claude") or "claude", "auth", "status"], capture_output=True, timeout=60, **_NO_WIN)
-            return so_claude()
+            if _lam_moi_token_claude():
+                return so_claude()
         print("✗ claude: HTTP", e.code); return None
     except Exception as e:
         print("✗ claude:", type(e).__name__); return None
